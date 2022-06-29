@@ -9,7 +9,7 @@ objectives:
 - "Understand the difference between blocking and non-blocking communication"
 - "Implement different collective routines"
 keypoints:
-- "In some cases, serialisation is worse than a deadlock, as you don't know the code is inhibited by poor perfromance"
+- "In some cases, serialisation is worse than a deadlock, as you don't know the code is inhibited by poor performance"
 - "Collective communication transmits data among all processes in a communicator, and must be called by all processes
   in a group"
 - "MPI is best used in C and Fortran, as in Python some function calls are either not present or are inhibited by poor

@@ -11,7 +11,7 @@ objectives:
 - "Use Send and Receive to create a ping-pong program"
 keypoints:
 - "MPI is the true way to achieve parallelism"
-- "`mpi4py` is an unoffical library that can be used to implement MPI in Python"
+- "`mpi4py` is an unofficial library that can be used to implement MPI in Python"
 - "A communicator is a group containing all the processes that will participate in communication"
 - "A rank is a logical ID number given to a process, and therefore a way to query the rank"
 - "Point to Point communication is the communication between two processes, where a source sends a message to a 
