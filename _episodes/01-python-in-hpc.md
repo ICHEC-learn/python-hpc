@@ -22,7 +22,7 @@ keypoints:
 
 Many of you, when you think of Python, think of the snake, but the origin of the name Python actually comes from the
 very popular Monty Python series, starring John Cleese, Michael Palin and so on which was broadcasted in the 70s as a 
-skit comedy show. It is also highly recommended viewing! The creators of the language realy enjoyed the show, and they
+skit comedy show. It is also highly recommended viewing! The creators of the language really enjoyed the show, and they
 named it after the show rather than the snake.
 
 It is a high level objective oriented language as I am sure many of you know and ideal for rapid development. But if
@@ -43,7 +43,7 @@ Why do we use Python though? In short...
 This is all well and good, and working with Python is often a go to for day to day programmers. So what is the problem?
 Shouldn't Python be the obvious choice for working on an HPC? 
 
-You probably have guessed why, especially if you ahve been working with Python for a few months. It's slow!
+You probably have guessed why, especially if you have been working with Python for a few months. It's slow!
 
 All the above points as to why Python is such a great language to use does unfortunately impact on its performance.
 Although Python is itself written in C under the hood, its dynamic nature and versatility causes it to be a poor
@@ -76,30 +76,30 @@ First though, we will make sure you can log into ICHEC systems.
 
 ## Python's reference counting and garbage collector
 
-Let us move onto reference counting and garbage collection. This is a very high livel overview of the memory management
+Let us move onto reference counting and garbage collection. This is a very high level overview of the memory management
 in Python. It is more complicated in reality, but this will give an overview to have a good idea of the governing
 principles. 
 
-<p align="center"><img src="../fig/refcount-1.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-1.png" width="30%"/></p>
 
 Let’s consider the example where a script that starts by creating a random numpy array and assigning it to a variable 
 `a`. In the background, you are creating a location in memory, that is continuous with some binary notation inside it. 
 When you create somethin, Python will update the reference count. The reference refers to the number of variables that
-point to the alloted location in memory. The reference is not to the variable, but to the location. If you ahve worked
+point to the allotted location in memory. The reference is not to the variable, but to the location. If you have worked
 with C, C++ this concept should be fairly familiar. 
 
-<p align="center"><img src="../fig/refcount-2.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-2.png" width="35%"/></p>
 
 Now let's create another operation and continue in the script, say you create a transpose of `a` and assign it to `b`,
 it doesn’t create new memory. Instead, the operation does some changes and reuses the same block of memory, as it is 
 used by two variables, and the reference counter will increase by 1. 
 
-<p align="center"><img src="../fig/refcount-3.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-3.png" width="40%"/></p>
 
 Let us continue our script again. We create have two other arrays, `c` and `d`, let us keep them the same size, our 
 reference counters will be 1 and 1. 
 
-<p align="center"><img src="../fig/refcount-4.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-4.png" width="45%"/></p>
 
 Now let us say we delete `c`, Our reference counter decreases as there is no variables that point to that block of 
 memory. The memory location has no variable pointing to it. There is another concept called *garbage collection* which
@@ -109,7 +109,7 @@ Python, but not to anything outside of Python. You effecitvely see it as a black
 Python however, sees it as an empty black box it can use. If you create a new variable, it may put it into this space 
 in memory. You can also reduce the reference count by setting `c = 1`, so that it now points somewhere else. 
 
-<p align="center"><img src="../fig/refcount-5.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-5.png" width="50%"/></p>
 
 Continuing with our script, if we allocate an array, `e` of `size = y`, where `y > x`, then the memory doesn’t fit, and 
 unlike a gas being able to become pressurised as it fits into a small container, we cannot fit this in in the same way 
@@ -119,7 +119,7 @@ The memory of NumPy arrays is allocated as a continuous block only. So the block
 if you create something later that fits in the memory. If that happens Python can allocate the memory, reuse it and set
 the reference counter to 1 again. 
 
-<p align="center"><img src="../fig/refcount-6.png" width="60%"/></p>
+<p align="center"><img src="../fig/refcount-6.png" width="55%"/></p>
 
 It will only be used up if you create a new item (which we will call `f`) which fits that memory space, then python can
 allocate, reuse the memory then set the reference to 1 again.
