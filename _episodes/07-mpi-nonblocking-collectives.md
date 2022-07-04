@@ -59,7 +59,7 @@ Lets think of our example working with a ring.
 
 Or you can initiate a non-blocking receive,, each calling receive, then the other work we can do is a blocking send, the message can be transferred.
 
-There is another example here, and this is a situation where one needs to know the boundary conditions in a process, in P0, we have technically our final row, the border_data and then some ghost data as well as the data taht stays local to the process.
+There is another example here, and this is a situation where one needs to know the boundary conditions in a process, in P0, we have technically our final row, the border_data and then some ghost data as well as the data that stays local to the process.
 
 We initialise a request, to Irecv the ghost data from process 1, and then Isend the border_data to process 1 so it can then do its own calculation. We can then do some work, as it is non-blocking, then wait for the sends and receives to complete, and then we can work on the border data
 

@@ -71,7 +71,7 @@ Point to Point communication, think of it like a game of ping pong (READ)
 
 There are a few types of sends, if you want more details go to a dedicated C/Fortran course. We have a synchronous send, where the sender gets information that the message has been received, and an asynchronous send, where the sender knows that the message has left, but after that, it has no clue.
 
-Here we have a simple send recieve we have our communicator
+Here we have a simple send receive we have our communicator
 
 We start with our rank 0, which contains some data, in this case a dictionary, and we want to send this data, to a destination, and we specify the destination rank. If you have used MPI with C and Fortran this is a simplified notation.
 

@@ -115,7 +115,7 @@ fib(10)
 {: .language-python}
 
 From here we can run the file in the terminal, or if you are using Jupyter notebook, you can use the cells themselves,
-or use the `!` operater to implement bash in the codeblock.
+or use the `!` operator to implement bash in the codeblock.
 
 ~~~
 $ python fibonacci_main.py
@@ -136,7 +136,7 @@ def fib_cyt(n):
 ~~~
 {: .language-python}
 
-Before we change our `fibonacci_main.py` to implement the function using Cython, we need to ado a fwe more things.
+Before we change our `fibonacci_main.py` to implement the function using Cython, we need to ado a few more things.
 This `.pyx` file is compiled by Cython into a `.c` file, which itself is then compiled by a C compiler to a `.so` or
 `.dylib` file. We will learn a bit more about these different file types in the [next episode](05.cffi.md).
 

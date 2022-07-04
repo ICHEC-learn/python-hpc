@@ -151,7 +151,7 @@ We create a new file which in the repo is ABI.py
 
 Next we cast the variables, because in the add function, in the original C code the input is two pointers and python doesn’t know what to do with them. The pointers in the C code point to a location in memory at which a variable of a certain value is stored
 
-Without going into details, we have two varaibles that python can’t handle by itself, so we need to cast them, we can call them aptr and bptr as we can then associate them for what they are. We are saying here that the value of the double * that we refer to in the C code, is actually going to be this ffi.from_buffer variable we have defined.
+Without going into details, we have two variables that python can’t handle by itself, so we need to cast them, we can call them aptr and bptr as we can then associate them for what they are. We are saying here that the value of the double * that we refer to in the C code, is actually going to be this ffi.from_buffer variable we have defined.
 
 Then we can use our lib handle to call the addition function using aprt and bptr. That’s how its done.
 
