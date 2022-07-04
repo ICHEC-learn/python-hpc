@@ -80,7 +80,7 @@ Let us move onto reference counting and garbage collection. This is a very high 
 in Python. It is more complicated in reality, but this will give an overview to have a good idea of the governing
 principles. 
 
-<p align="center"><img src="../fig/refcount-1.png" width="30%"/></p>
+<p align="center"><img src="../fig/refcount-1.png" width="50%"/></p>
 
 Let’s consider the example where a script that starts by creating a random numpy array and assigning it to a variable 
 `a`. In the background, you are creating a location in memory, that is continuous with some binary notation inside it. 
@@ -88,18 +88,18 @@ When you create somethin, Python will update the reference count. The reference 
 point to the allotted location in memory. The reference is not to the variable, but to the location. If you have worked
 with C, C++ this concept should be fairly familiar. 
 
-<p align="center"><img src="../fig/refcount-2.png" width="35%"/></p>
+<p align="center"><img src="../fig/refcount-2.png" width="50%"/></p>
 
 Now let's create another operation and continue in the script, say you create a transpose of `a` and assign it to `b`,
 it doesn’t create new memory. Instead, the operation does some changes and reuses the same block of memory, as it is 
 used by two variables, and the reference counter will increase by 1. 
 
-<p align="center"><img src="../fig/refcount-3.png" width="40%"/></p>
+<p align="center"><img src="../fig/refcount-3.png" width="50%"/></p>
 
 Let us continue our script again. We create have two other arrays, `c` and `d`, let us keep them the same size, our 
 reference counters will be 1 and 1. 
 
-<p align="center"><img src="../fig/refcount-4.png" width="45%"/></p>
+<p align="center"><img src="../fig/refcount-4.png" width="50%"/></p>
 
 Now let us say we delete `c`, Our reference counter decreases as there is no variables that point to that block of 
 memory. The memory location has no variable pointing to it. There is another concept called *garbage collection* which
@@ -119,7 +119,7 @@ The memory of NumPy arrays is allocated as a continuous block only. So the block
 if you create something later that fits in the memory. If that happens Python can allocate the memory, reuse it and set
 the reference counter to 1 again. 
 
-<p align="center"><img src="../fig/refcount-6.png" width="55%"/></p>
+<p align="center"><img src="../fig/refcount-6.png" width="50%"/></p>
 
 It will only be used up if you create a new item (which we will call `f`) which fits that memory space, then python can
 allocate, reuse the memory then set the reference to 1 again.
@@ -145,7 +145,7 @@ or return peculiar results.
 > $ source activate jupyterhub
 > $ jupyterhub_kay
 > ~~~
-> {: .langauge-bash}
+> {: .language-bash}
 >
 > After typing these few lines, it it will print some instructions to create and use a SSH tunnel. For example, you may
 > see some output similar to the following.
