@@ -104,98 +104,382 @@ Also ffibuilder, but its better to get to work actually using these functions
 
 6:
 
-Importing an existing library
+## Pointers in C
+
+This is a complex topic at the best of times but when dealing with code in C, it is ineviteable that you will encounter
+pointers. Put simply, a pointer is a variable that contains the address of a variable. The reason they are used is
+because sometimes they are the only way of expressing a computation, and they can lead to more compact and efficient
+code.
+
+Let's take a simplified version of what pointers actually do, as the concept can be tricky for non-C users. Say you
+are working your way through a computation, in the way that a zookeeper is working through their enclosure records. 
+Imagine you are sitting in an office, and the amount of space in your office is equivalent to the memory available in
+your computer program. You can bring some insects and small furry animals to calalog them without much difficulty, but
+if you keep them in the room whilst you are creating your catalog (or running your program), you are going to run out 
+of memory space fairly quickly. Similarly, if you brought an elephant into your room... everyone knows the phrase! 
+Think of the animals as individual variables, or the elephant as a very large one. Importing and having varibles in
+your program can waste a lot of memory. 
+
+So in this situation, how is the zookeeper going to know and keep track of what animals he/she actually has? In this
+example, let's say they set up a video link to every enclosure in the zoo. The video link displays on it the name of
+the enclosure and the zookeeper can see what animals are present. You can think of this as the enclosure *address*. 
+Rather than getting the animals into an enclosed space one by one or multiple ones at the same time, all you need is
+some method to identify where the animal actually is, and you can still do some work based on that. 
+
+This is the concept of what a pointer does, containing the address of a variable, or in tune with our example, the
+enclosure name of "Nellie the Elephant". 
+
+The address in computational terms is an integer variable, and it is the physical location in memory to where a 
+variable is stored. When dealing with pointers, we often do something known as **deferencing**, which is the act of
+referring to where the pointer points to, rather than the memory address. When we access the nth element of an array,
+we are doing the same thing. Arrays themselves are technically pointers, accessing the first item in an array is the
+same as referencing a pointer. In C this is done using the `*` operator. 
+
+
+Let's have a look at some code to see how it works. There are two methods of dealing with pointers.
+
+~~~
+#include <stdio.h>
+
+int main()
+{
+    /* We define a local variable A, the actual declaration */
+    int A = 1;
+    /* Now we define the pointer variable, and point it to A using the & operator */ 
+    int * pointer_to_A = &A;
+
+    printf("Method 1:\nThe value A is %d\n", A); 
+    printf("The value of A is also %d\n", *pointer_to_A);
+
+    int B = 2;
+    /* Let's define a pointer variable pB */
+    int * pB; 
+    /* store the address of B in pointer variable */ 
+    pB = &B;
+
+    printf("\nMethod 2:\nThe address of B variable is %p\n", &B); 
+    printf("However the address stored in the pB variable is %p\n", pB); 
+    printf("And the value of the *pB variable is %d\n", *pB);
+
+    return 0;
+}
+~~~
+{: .language-c}
+
+~~~
+$ gcc -o pointers.o pointers.c
+$ ./pointers.o
+~~~
+{: .language-bash}
+
+~~~
+Method 1:
+The value A is 1
+The value of A is also 1
+
+Method 2:
+The address of B variable is 0x7ffee11d36bc
+However the address stored in the pB variable is 0x7ffee11d36bc
+And the value of the *pB variable is 2
+~~~
+{: .output}
+
+> ## Practice with pointers
+> 
+> Take some time to fiddle with the code above, see what works, how it fails to compile at times and why. Try writing
+> your own code this time with `double` for variables, similar to the above until you get used to it. Will the `double`
+> type work with the pointers?
+>
+{: .challenge}
+
+## Importing an existing library
 
 So how to use it?
 
-Lets looks into how to import an existing library and a particular function in that library, here we use the square root function in the c math library
+Let's looks into how to import an existing library and a particular function in that library, here we use the square 
+root function in the C math library.
 
-We import the FFI class from cffi and set it equal to a variable ffi. This top level class is instantiated once or do it once per module 
+~~~
+from cffi import FFI
+ffi = FFI()
 
-We can use that ffi variable to open the library using the dlopen function, which returns a dynamic library. Library files have a .so extension for Windows and UNIX systems and .dylib for Macs, so if you are a Mac user and want to get this working on your own machine, Depending on the machine, the .6 extension may or may not be needed
+lib = ffi.dlopen("libm.so.6")
+ffi.cdef("""float sqrtf(float x);""")
+a = lib.sqrtf(4)
+print(a)
+~~~
+{: .language-python}
 
-Now we use ffi.cdef to define the function we want, we only need the declaration of the function not the implementation. The library file itself will have its own declaration of what this function does and we don’t need to worry about that, all we need in this case is the the declaration of the function. This will cause python to recognise that the sqrtf can be used and we can now use our variable lib, which we have defined to open the library and call the function
+1. We import the FFI class from cffi and set it equal to a variable ffi. This top level class is instantiated once and
+   only needed once per module.
+2. From there we can use the newly defined `ffi` variable to open the library using the `dlopen` function, which 
+   returns a dynamic library, in this case the `libm` library from C. 
+3. Now we use `ffi.cdef` to define the function we want, we only need the declaration of the function not the 
+   implementation. The library file itself will have its own declaration of what this function does and we don’t need
+   to worry about that, all we need in this case is the the declaration of the function. This will cause python to 
+   recognise that the `sqrtf` can be used and we can now use our variable lib, which we have defined to open the
+   library and call the function.
 
-Now for the fun stuff, creating and using your own library. Here we are going to do things as simply as possible, the same thing twice.
+> ## Library files across different operating systems
+>
+> Library files have a `.so` extension for Windows and UNIX systems and `.dylib` for Macs. So if you are a Mac user and
+> wish to get this working locally, ensure that you replace the `.so` with `.dylib`. Depending on your machine on Linux
+> or Windows system, an additional `.6` extension may or may not be needed. Usually if `.so` does not work, then the
+> `.so.6` extension will.
+>
+{: .callout}
 
-7:
+## Creating and using your own library
 
-Step 1: Create a file in C
+Now for the fun stuff, creating and using your own library. Of the 4 combinations that CFFI has, we will look at the
+**ABI in-line** method.
+
+### ABI in-line
+
+The first step is to create a file in C, which we will call `ABI_add.c`, a very simple C file that adds two variables.
+
+~~~
+#include <stdio.h>
+
+void add(double *a, double *b, int n)
+{
+    int i;
+    for (i=0; i<n; i++) {
+        a[i] += b[i];
+    }
+}
+~~~
+{: .language-c}
+
+Next we create a `Makefile`. These are handy tools, however many programmers can’t write one of these from scratch and 
+borrow one which someone else has made earlier. We won't cover this in much detail, but what it is doing is compiling
+the C file and putting it into a `.so` library.
+
+~~~
+CC=gcc
+CFLAGS=-fPIC -O3
+LDFLAGS=-shared
+
+mylib_add.so: ABI_add.c
+	$(CC) -o ABI_add.so $(LDFLAGS) $(CFLAGS) ABI_add.c
+~~~
+{: language-bash}
+
+From here we can create our library by typing `make` in the terminal. Have a quick check of the directory contents
+before running the command using `ls` and see how it has changed.
+
+~~~
+$ make
+~~~
+{: .langauge-bash}
+
+You can see if you type `ls` again that our library has been added as a `.so` file.
+
+Now we need to go about importing the library and casting our variables and this is where we can start working with
+Python again. There are a few specific functions to get the C library which we created working in Python.
+
+- `ffi.dlopen(libpath, [flags])` - opens and returns a handle to a dynamic library, which we can then use later to 
+  call the functions from that library
+- `ffi.cdef("C-type", value)` - creates a new ffi object with the declaration of function
+- `ffi.cast("C-type", value)` - The value is casted between integers or pointers of any type
+- `ffi.from_buffer([cdecl], python_buffer)` - Return an array of cdata that points to the data of the given Python 
+  object
+
+Let's look at the code for importing and running this library:
+
+~~~
+from cffi import FFI
+import numpy as np
+import time 
+
+ffi = FFI()
+lib = ffi.dlopen('./ABI_add.so')
+ffi.cdef("void add(double *, double *, int);")
 
 
+t0=time.time()
+a = np.arange(0,200000,0.1)
+b = np.ones_like(a)
 
-Our C file has this function in it, we don’t necessarily need a C file which has a main function, as we just want to use this particular function. 
+# "pointer" objects
+aptr = ffi.cast("double *", ffi.from_buffer(a))
+bptr = ffi.cast("double *", ffi.from_buffer(b))
 
-8:
+lib.add(aptr, bptr, len(a))
+print("a + b = ", a)
+t1=time.time()
 
-Step 2: Create a MakeFile
+print ("\ntime taken for ABI in line", t1-t0)
+~~~
+{: .language-python}
 
-These can be a pain to write and a lot of programmers can’t write one of these from scratch and borrow one which someone else has made earlier, same concept here, 
-CC is the C compiler we are using
-CFLAGS the optimisation
-Some more flags and then the command that runs them. So you needn’t worry about this, but this is the file we are creating
+Once we have imported our library, we use the `ffi.cdef` to declare our `add` function. But as we saw in the original
+C code, the input is two pointers. Python doesn’t know what to do with them, so we have two variables that python can’t
+handle by itself, so we need to cast them, using the `ffi.cast` function. We can call them `aptr` and `bptr` as we can 
+then associate them for what they are. From there, we are telling python that the value of the `double *` that we refer
+to in the C code, is actually going to be this `ffi.from_buffer` variable we have defined.
 
-Step 3: using the make command in the terminal
+Then we can use our `lib` handle to call the addition function using `aptr` and `bptr`. 
 
-We run it and see;
+That's how to work with ABI in-line, now let's look at the other method. **API out-of-line**.
 
-When we run make in the terminal it will then make the library for you. 
+### API out-of-line
 
-We see now that a .so file has been added here, and this .so file is our library
+Our first step is to create a python "build" file. This is similar to how we worked with Cython. We need to set up an
+`ffi.builder` handle, then using `ffi.cdef` create a new ffi-object. We will also introduce the `ffibuilder.set_source`
+function which gives the name of the extension module to produce, and we input some C source code as a string as an
+argument. This C code needs to make the declarated functions, types and globals available. The code below represents
+what we are putting into our file which we will call `API_add_build.py`
 
-9:
+~~~
+import cffi
+ffibuilder = cffi.FFI()
+ffibuilder.cdef("""void API_add(double *, double *, int);""")
+ffibuilder.set_source("out_of_line._API_add", r"""
+  void API_add(double *a, double *b, int n)
+  {
+      int i;
+      for (i=0; i<n; i++){
+          a[i] += b[i];
+          }
+          /* or some algorithm that is seriously faster in C than in Python */
+  }
+  """)
 
-Step 4: importing it
 
-We create a new file which in the repo is ABI.py
+if __name__ == "__main__":
+    ffibuilder.compile(verbose=True)
+~~~
+{: .language-python}
 
-Next we cast the variables, because in the add function, in the original C code the input is two pointers and python doesn’t know what to do with them. The pointers in the C code point to a location in memory at which a variable of a certain value is stored
+When we set a variable called `ffibuilder` to `cffi.FFI()`, the difference with the ABI version is more of a syntax 
+checker and making sure you don’t get mixed up between the different modes you use.
 
-Without going into details, we have two variables that python can’t handle by itself, so we need to cast them, we can call them aptr and bptr as we can then associate them for what they are. We are saying here that the value of the double * that we refer to in the C code, is actually going to be this ffi.from_buffer variable we have defined.
+When we use the `set_source` function, the implementation goes in. First we define the name of the module, `out_of_line`
+and then the extension `._API_add`. This will be be module folder and then the module name, `API_add`. The `r` 
+indicates we want the function to read the following C code.
 
-Then we can use our lib handle to call the addition function using aprt and bptr. That’s how its done.
+You may wonder what happens if you have a long C function. You can add in a header file and it will read that instead, 
+feel free to try that out for yourselves. 
 
-It may seem confusing at first, that’s ok it was for me initially, but we have enough time for you to try this out. 
+At the end we have a compile function that runs through a C compiler.
 
-10
+Now we run our build file in the terminal. This will create a new directory, called `out_of_line`, which is the name of
+our module. Inside that directory we will have our library file (`.so`/`.dylib`) and our `.c` and `.o` files.
 
-API
+~~~
+$ python API_add_build.py
+~~~
+{: .language-bash}
 
-Same code we are trying to implement, different method. This time we are writing a build file in python.
+From here we import the library and like before cast the variables.
 
-first , import Cffi, then set a variable called ffibuilder to cffi.FFI(). Why the difference, more of a syntax and making sure you don’t get mixed up between the different modes you use.
+~~~
+import numpy as np 
+import time
+from out_of_line._API_add import ffi, lib
 
-Use cdef again like we did previously, define the function.
+t0=time.time()
+a = np.arange(0,200000,0.1)
+b = np.ones_like(a)
 
-Now here things are different where we use the set_source function. This is where your function implementation goes in. First we define a the name of the module, out_of_line anf then dot _API_add. This will be be module folder and then the module name, API_add, after that we type r, indicting we want the function to read the following C code.
+# "pointer" objects
+aptr = ffi.cast("double *", ffi.from_buffer(a))
+bptr = ffi.cast("double *", ffi.from_buffer(b))
 
-What if I have a long C function you might ask, good question, you can just add in a header file and it will read that, but for the moment this will serve our purpose well
+lib.API_add(aptr, bptr, len(a))
+print("a + b = ", a)
+t1=time.time()
+print("\ntime taken for API out of line", t1-t0)
+~~~
+{: .language-python}
 
-At the end we have a compile function that runs through a C compiler. Like I said before, this is the better, albeit theoretically slightly trickier way to do it, but I personally find it easier.
+It is the same structure as as the previous method, import the library and cast the variables. The only one difference
+here compared to the ABI version is in the import, where we import the library directly from `out_of_line._API_add` as
+well as `ffi`.
 
-Step 2
+> ## Possible errors 
+>
+> You may find a ImportError related to dynamic module export function. If this happens, try working on your code in a
+> different directory.
+>
+{; .callout}
 
-Now we run our python file and lets see what that looks like by typing ls, listing the contents of the directory.
+> ## Fibonacci example
+>
+> Consider the fibonacci code given in [`fibonacci.c`](../files/04-CFFI/exercise1_2/fibonacci.c). It requires the user 
+> to input a positive integer `n`, which is the number of terms to be performed by the `fibo` function, for which the 
+> arguments are two `int *`.
+>
+> The `fibo` function itself is utilised in a `for` loop.
+>
+> Use either ABI in-line or API out-of-line methods as outlined above to import and implement this code.
+> 
+> Below is a skeleton code you can use to implement your library
+> 
+> ~~~
+> import numpy as np 
+> import time
+> 
+> # TODO (API) From newly created library import ffi, lib
+> 
+> # TODO (ABI) Open library and define function
+> 
+> # Number of terms in sequence
+> n = 10
+> 
+> # TODO: Define your pointer objects (HINT: there is no buffer and nothing to cast. Use this to create a new variable using ffi.new)
+> aptr = 
+> bptr = 
+> 
+> # Sets up the first two terms of fibonacci
+> aptr[0] = 0
+> bptr[0] = 1
+> 
+> for i in range(n+1):
+>     # TODO: Call the function
+>     print(bptr[0]
+> ~~~
+> {: .language-python}
+>
+> > ## Solution
+> > 
+> > A full solution can be found in the Jupyter notebook [here](../files/04-CFFI/soln/04-Soln-cffi.ipynb).
+> > 
+> {: .solution}
+{: .challenge}
 
-The python build file has created an ou-of-line folder, and within it, the library .so file and the .c and .o files. 
-
-11:
-
-Step 3
-
-Now same as before import the library and cast the variables, there is only one difference here compared to the last time we ran this and that is line 3 here. Instead of opening the library using dlopen and assigning it to a variable called lib, here we import the library directly from out_of_line._API_add as well as ffi
-
-Our pointers stay the same, the rest of the code is as above.
-
-12:
-
-So here is a summary of the different methods you can use either using ABI or API modes.
-
-Do you want me to go over the steps of this again briefly before we move onto an exercise?
-
-Exercise
-
-Now a few exercises for you to occupy yourselves with for the rest of the session, first check out the code in the demo folder then submit the job so you are comfortable with it, then try the fibonacci and evolve codes and see how you do.
+> ## Evolve
+>
+> This exercise is based on the `evolve.py` file which we have used a few times during this course. You can implement
+> this in either ABI or API modes, or both!
+> 
+> All existing file names are linked. You may wish to create a few copies of 
+> [`heat_equation_simple.py`](../files/04-CFFI/exercise3/heat_equation_simple.py) for different methods.
+>
+> ### API mode
+>
+> By copying and pasting the C code in [`evolve.c`](../files/04-CFFI/exercise3/evolve.c), create a `build` file to 
+> utilize the C code using API out-line mode.
+>
+> - Run the build file to create the library
+> - Import your newly created library back into 
+>   [`heat_equation_simple.py`](../files/04-CFFI/exercise3/heat_equation_simple.py)
+>
+> ### ABI mode
+>
+> The files [`evolve.h`](../files/04-CFFI/exercise3/evolve.h) and [`evolve.c`](../files/04-CFFI/exercise3/evolve.c) 
+> contain a pure C implementation of the single time step in the heat equation. The C implemention can be built into a
+> shared library with the provided [`Makefile`](../files/04-CFFI/exercise3/Makefile) by executing the make command.
+>
+> - Edit the heat_equation_simple.py file to use CFFI in the ABI in-line mode.
+> - Utilize the library function instead of the Python function.
+> 
+> > ## Solution
+> >
+> > A full solution can be found in the Jupyter notebook [here](../files/04-CFFI/soln/04-Soln-cffi.ipynb).
+> {: .solution}
+{: .challenge}
 
 
 {% include links.md %}
