@@ -114,10 +114,10 @@ code.
 Let's take a simplified version of what pointers actually do, as the concept can be tricky for non-C users. Say you
 are working your way through a computation, in the way that a zookeeper is working through their enclosure records. 
 Imagine you are sitting in an office, and the amount of space in your office is equivalent to the memory available in
-your computer program. You can bring some insects and small furry animals to calalog them without much difficulty, but
+your computer program. You can bring some insects and small furry animals to catalog them without much difficulty, but
 if you keep them in the room whilst you are creating your catalog (or running your program), you are going to run out 
 of memory space fairly quickly. Similarly, if you brought an elephant into your room... everyone knows the phrase! 
-Think of the animals as individual variables, or the elephant as a very large one. Importing and having varibles in
+Think of the animals as individual variables, or the elephant as a very large one. Importing and having variables in
 your program can waste a lot of memory. 
 
 So in this situation, how is the zookeeper going to know and keep track of what animals he/she actually has? In this
@@ -263,7 +263,7 @@ LDFLAGS=-shared
 mylib_add.so: ABI_add.c
 	$(CC) -o ABI_add.so $(LDFLAGS) $(CFLAGS) ABI_add.c
 ~~~
-{: language-bash}
+{: .language-bash}
 
 From here we can create our library by typing `make` in the terminal. Have a quick check of the directory contents
 before running the command using `ls` and see how it has changed.
@@ -271,7 +271,7 @@ before running the command using `ls` and see how it has changed.
 ~~~
 $ make
 ~~~
-{: .langauge-bash}
+{: .language-bash}
 
 You can see if you type `ls` again that our library has been added as a `.so` file.
 
@@ -328,7 +328,7 @@ That's how to work with ABI in-line, now let's look at the other method. **API o
 Our first step is to create a python "build" file. This is similar to how we worked with Cython. We need to set up an
 `ffi.builder` handle, then using `ffi.cdef` create a new ffi-object. We will also introduce the `ffibuilder.set_source`
 function which gives the name of the extension module to produce, and we input some C source code as a string as an
-argument. This C code needs to make the declarated functions, types and globals available. The code below represents
+argument. This C code needs to make the declared functions, types and globals available. The code below represents
 what we are putting into our file which we will call `API_add_build.py`
 
 ~~~
@@ -403,7 +403,7 @@ well as `ffi`.
 > You may find a ImportError related to dynamic module export function. If this happens, try working on your code in a
 > different directory.
 >
-{; .callout}
+{: .callout}
 
 > ## Fibonacci example
 >
@@ -469,8 +469,8 @@ well as `ffi`.
 > ### ABI mode
 >
 > The files [`evolve.h`](../files/04-CFFI/exercise3/evolve.h) and [`evolve.c`](../files/04-CFFI/exercise3/evolve.c) 
-> contain a pure C implementation of the single time step in the heat equation. The C implemention can be built into a
-> shared library with the provided [`Makefile`](../files/04-CFFI/exercise3/Makefile) by executing the make command.
+> contain a pure C implementation of the single time step in the heat equation. The C implementation can be built into
+> a shared library with the provided [`Makefile`](../files/04-CFFI/exercise3/Makefile) by executing the make command.
 >
 > - Edit the heat_equation_simple.py file to use CFFI in the ABI in-line mode.
 > - Utilize the library function instead of the Python function.
