@@ -166,6 +166,16 @@ or return peculiar results.
 > You will be requested a password after successful entry, the window will not show any output. You can then head to a
 > web browser, ideally Chrome or Firefox and enter the link in the second step of the isntructions.
 >
+> From there you can follow the steps, selecting **Login node** from the drop down menu and use your credentials to 
+> log in.
+>
+> You can also clone this repository and all the notebooks, slides markdown and exercises can be available for you.
+> Open a terminal in JupyterLab and type the following.
+>
+> ~~~
+> $ git clone https://github.com/ICHEC-learn/python-hpc.git
+> ~~~
+> {: .language-bash}
 {: .challenge}
 
 
