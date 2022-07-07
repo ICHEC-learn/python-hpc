@@ -81,28 +81,22 @@ We are
 
 CFFI has two different modes which it operates from, **ABI** and **API**, and we will look first at ABI.
 
-### ABI - Application Binary Interface
+**ABI - Application Binary Interface**
 
 This mode accesses the guest library at the binary level, which sounds ideal as all code gets translated into binary 
 code, but here, it can have major difficulties if you have non-Windows setup. Even so it is like playing with fire, 
 because the function calls themselves need to go through the `libffi` library which is a slow step and a significant 
 performance bottleneck. Despite this, it is considered to be the easier of the two, modes s
 
-2. API - Application Programmer interface and a separate compilation step with a C compiler is needed and is recommended as a result of that, as well as being faster. The work we will be doing here, you won’t see much of a speedup, its more to get you used to how the libraries work.
+**API - Application Programmer Interface**
 
-Worth mentioning that each of these modes have sub-modes out-of-line and in-line. This refers to the format of how you write the necessary code.
+This method contains a separate compilation step with a C compiler. Due to the use of the C compiler, this method is
+recommended, allied with the fact it is also faster. 
 
-5:
+Each of these modes have sub-modes out-of-line and in-line. This refers to the format of how you write the necessary 
+code.
 
-SO here I will be going through two different setups, ABI in line and API out-of line.
-
-The ffi interface is used like a library, and there is a few different functions you can use, the main ones are ffi.cast where the value of a pointer is cast into an integer, so you define a variable referring to a pointer
-
-Ffi.dlopen which opens and returns an access point to the library you use.
-
-Also ffibuilder, but its better to get to work actually using these functions
-
-6:
+Before we dive into the modes themselves, we need to cover an important topic in C, pointers.
 
 ## Pointers in C
 
@@ -428,7 +422,7 @@ well as `ffi`.
 > # Number of terms in sequence
 > n = 10
 > 
-> # TODO: Define your pointer objects (HINT: there is no buffer and nothing to cast. Use this to create a new variable using ffi.new)
+> # TODO: Define your pointer objects (HINT: there is no buffer and nothing to cast. Create a new variable using ffi.new)
 > aptr = 
 > bptr = 
 > 
