@@ -257,7 +257,7 @@ p.strip_dirs() #The strip_dirs() method removes the extraneous path from all the
 # Other string options include 'cumulative', 'name', 'ncalls'
 p.sort_stats('time').print_stats(10)
 ~~~
-{: .language=python}
+{: .language-python}
 
 ~~~
 Day Month Date HH:MM:SS Year    heat_equation_simple.prof
@@ -361,7 +361,7 @@ Day Month Date HH:MM:SS Year my.prof
 > {: .language-python}
 >
 > > ## Solution
->
+> >
 > {: .solution}
 {: .challenge}
 
@@ -422,9 +422,9 @@ Thankfully, simple libraries like NumPy can assist with this
 - NumPy sacrifices Python's flexibility to achieve low-memory usage and speed-up, as NumPy arrays have a fixed size and the datatype of its element must be homogeneous.
 - Written in C, which is known for being a efficient programming language in terms of speed and memory usage.
 
-NumPy arrays can be created from a Python list or tuple by using NumPy’s array function. The dimensionaility and shape of the resulting array will be determined by the given input. NumPy offers several functions for creating arrays, depending on the desired content and shape of the array.
+NumPy arrays can be created from a Python list or tuple by using NumPy’s array function. The dimensionality and shape of the resulting array will be determined by the given input. NumPy offers several functions for creating arrays, depending on the desired content and shape of the array.
 
-When creating an array, NumPy will try to convert entries to convinient data type. If it is not possible, it will raise an error.
+When creating an array, NumPy will try to convert entries to convenient data type. If it is not possible, it will raise an error.
 
 Link to Numpy documentation: array
 
