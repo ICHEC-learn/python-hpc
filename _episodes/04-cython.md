@@ -18,6 +18,9 @@ keypoints:
 - "From the terminal the code can be run with `python setup.py build_ext --inplace`"
 - "Cython 'typeness' can be done using the `%%cython -a` cell magic, where the yellow tint is coloured according to
   typeness."
+- "Main methods of improving Cython speedup include static type declarations, declaration of functions with `cdef`,
+  using `cimport` and utilising fast index of C-numpy arrays and types."
+- "Compiler directives can be used to turn off certain python features."
 ---
 
 <p align="center"><img src="../fig/ICHEC_Logo.jpg" width="40%"/></p>
@@ -251,7 +254,278 @@ the code itself shortly.
 > {: .solution}
 {: .challenge}
 
+## Accelerating Cython
+
+Compiling with Cython is fine, but it doesn't speed up our code to actually make a significant difference. We need to
+implement the C-features that Cython was designed for. Let's take the code block below as an example of some code to
+speed up.
+
+~~~
+import time
+from random import random
+
+def pi_montecarlo(n=1000):
+    '''Calculate PI using Monte Carlo method'''
+    in_circle = 0
+    for i in range(n):
+        x, y = random(), random()
+        if x ** 2 + y ** 2 <= 1.0:
+            in_circle += 1
+        
+    return 4.0 * in_circle / n
+
+N = 100000000
+
+t0 = time.time()
+pi_approx = pi_montecarlo(N)
+t_python = time.time() - t0
+print("Pi Estimate:", pi_approx)
+print("Time Taken", t_python)
+~~~
+{: .language-python}
+
+Running this as a `.py` file for 100,000,000 points will result in a time of `~27.98` seconds. Compiling with Cython 
+will speed it up to `~17.20` seconds. 
+
+It may be a speed-up but not as significant as we would want. There are a number of different methods we can use.
+
+### Static type declarations
+
+These allow Cython to step out of the dynamic nature of the Python code and generate simpler and faster C code, and 
+sometimes it can make code faster by orders of magnitude.
+
+This is often the simplest and quickest way to achieve significant speedup, but trade-off is that the code can become
+more verbose and less readable.
+
+Types are declared with `cdef` keyword. Now let's implement this into our montecarlo file.
+
+~~~
+def pi_montecarlo(int n=1000):
+    cdef int in_circle = 0, i
+    cdef double x, y
+    for i in range(n):
+        x, y = random(), random()
+        if x ** 2 + y ** 2 <= 1.0:
+            in_circle += 1
+        
+    return 4.0 * in_circle / n
+~~~
+{: .language-python}
+
+Running this using the timing setup from the previous code block, by only declaring our variables as an `int` and 
+`double` has decreased our execution time to `~4.03` seconds.
+
+We can go further though!
+
+### Typing function calls
+
+As with 'typing' variables, you can also 'type' functions. Function calls in Python can be expensive, and can be even
+more expensive in Cython as one might need to convert to and from Python objects to do the call.
+
+There are two ways in which to declare C-style functions in Cython;
+- Declaring a C-type function with `cdef`. This is the same as declaring a variable
+- Creating a Python wrapper with `cpdef`
+
+> ## Using `cdef` and `cpdef` in notebooks with magics
+>
+> A side-effect of `cdef` is that the function is no longer available from Python-space, so Python won't know how to
+> call it.
+>
+> If we declare a simple function like below in a Jupyter notebook cell;
+> 
+> ~~~
+> cdef double cube_cdef(double x):
+>     return x ** 3
+> ~~~
+> {: .language-python}
+> 
+> And from there we use `%time cube_cdef(3)`, we will get the following error.
+> ~~~
+> ---------------------------------------------------------------------------
+> NameError                                 Traceback (most recent call last)
+> <timed eval> in <module>
+> 
+> NameError: name 'cube_cdef' is not defined
+> ~~~
+> {: .output}
+>
+> If we want to be able to use the magics command, we will need to use `cpdef`.
+{: .callout}
+
+Now let's implement our function call.
+
+~~~
+cdef double pi_montecarlo(int n=1000):
+    '''Calculate PI using Monte Carlo method'''
+    cdef int in_circle = 0, i
+    cdef double x, y
+    for i in range(n):
+        x, y = random(), random()
+        if x ** 2 + y ** 2 <= 1.0:
+            in_circle += 1
+        
+    return 4.0 * in_circle / n
+~~~
+{: .language-python}
+
+Our timing has reduced again to `~3.60` seconds. Not a massive decrease, but still significant.
+
+Static type declarations and function call overheads can significantly reduce runtime, however there are additional
+things you can do to significantly speed up runtime.
+
+### NumPy arrays with Cython
+
+Let's take a new example with a numpy array that calculates a 2D array.
+
+~~~
+import numpy as np
+def powers_array(N, M):
+    data = np.arange(M).reshape(N,N)
+    
+    for i in range(N):
+        for j in range(N):
+            data[i,j] = i**j
+    return(data[2])
+
+%time powers_array(15, 225)
+~~~
+{: .language-python}
+
+~~~
+CPU times: user 159 µs, sys: 112 µs, total: 271 µs
+Wall time: 294 µs
+array([    1,     2,     4,     8,    16,    32,    64,   128,   256,
+         512,  1024,  2048,  4096,  8192, 16384])
+~~~
+{: .output}
+
+A small function that takes a short amount of time, but there is a NumPy array we can cythonise. We need to import 
+NumPy with `cimport` then declare it as a C variable.
+
+~~~
+import numpy as np # Normal NumPy import
+cimport numpy as cnp # Import for NumPY C-API
+
+def powers_array_cy(int N, int M): # declarations can be made only in function scope
+    cdef cnp.ndarray[cnp.int_t, ndim=2] data
+    data = np.arange(M).reshape((N, N))
 
 
+    for i in range(N):
+        for j in range(N):
+            data[i,j] = i**j
+    return(data[2])
+
+%time powers_array_cy(15,225)
+~~~
+{: .language-python}
+
+~~~
+CPU times: user 151 µs, sys: 123 µs, total: 274 µs
+Wall time: 268 µs
+array([    1,     2,     4,     8,    16,    32,    64,   128,   256,
+         512,  1024,  2048,  4096,  8192, 16384])
+~~~
+{: .output}
+
+Note that for a small array like this, the speed up is not significant, you may even have got a slow down, why? Have a
+think as we go through the final main step on how to speed up code.
+
+### Compiler directives
+
+These affect the code in a way to get the compiler to ignore things that it would usually look out for. There are 
+plenty of examples as discussed in the Cython documentation, however the main ones we will use here are;
+
+- `boundscheck` - If set to `False`, Cython is free to assume that indexing operations in the code will not cause any
+  IndexErrors to be raised
+- `wraparound` - If set to `False`, Cython is allowed to neither check for nor correctly handle negative indices. This
+  can cause data corruption or segmentation faults if mishandled, so use with caution!
+
+You should implement these at a point where you know that the code is working efficiently and that any issues what
+could be raised by the compiler are sorted. There are a few ways to implement them;
+
+1. With a header comment at the top of a `.pyx` file, which must appear before any code
+
+~~~
+# cython: boundscheck=False
+~~~
+{: .language-python}
+
+2. Passing a directive on the command line using the -X switch
+
+~~~
+$ cython -X boundscheck=True ...
+~~~
+{: .language-bash}
+
+3. Or locally for specific functions, for which you first need the cython module imported
+
+~~~
+  cimport cython
+  @cython boundscheck(False)
+~~~
+{: .language-python}
+
+## Typing and Profiling
+
+For anyone new to Cython and the concept of declaring types, there is a tendancy to 'type' everything in sight. This 
+reduces readability and flexibility and in certain situations, even slow things down in some circumstances, such as 
+what we saw in the previous code block. We have unnecessary typing
+
+It is also possible to kill performance by forgetting to 'type' a critical loop variable. Tools we can use are 
+profiling and annotation.
+
+Profiling is the first step of any optimisation effort and can tell you where the time is being spent. Cython's 
+annotation can tell you why your code is taking so long.
+
+Using the `-a` switch in cell magics (`%%cython -a`), or `cython -a cython_module.pyx` from the terminal creates a HTML
+report of Cython and generated C code. Alternatively, pass the `annotate=True` parameter to `cythonize()` in the 
+`setup.py` file (Note, you may have to delete the C file and compile again to produce the HTML report).
+
+This HTML report will colour lines according to typeness. White lines translate to pure C (fast as normal C code).
+Yellow lines are those that require the Python C-API. Lines with a `+` are translated to C code and can be viewed by
+clicking on it.
+
+By default, Cython code does not show up in profile produced by cProfile. In Jupyter notebook or indeed a source file, 
+profiling can be enabled by including in the first line;
+
+~~~
+# cython: profile=True
+~~~
+{: .language-python}
+
+Alternatively, if you want to do it on a function by function basis, you can exclude a specific function while 
+profiling code.
+
+~~~
+# cython: profile=True
+import cython
+@cython.profile(False)
+cdef func():
+~~~
+{: .language-python}
+
+Or alternatively, you only need to profile a highlighted function
+
+~~~
+# cython: profile=False
+import cython
+@cython.profile(True)
+cdef func():
+~~~
+{: .language-python}
+
+To run the profile in Jupyter, we can use the cell magics `%prun func()`
+
+> ## Generate a profiling report
+>
+> Use the methoda described above to profile the Montecarlo code. What lines of the code hint at a Python interaction?
+> Why?
+> 
+{: .challenge}
+
+
+
+## Acceleration Case Study: Julia Set
 
 {% include links.md %}
