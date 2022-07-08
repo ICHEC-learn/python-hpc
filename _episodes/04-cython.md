@@ -429,7 +429,9 @@ array([    1,     2,     4,     8,    16,    32,    64,   128,   256,
 {: .output}
 
 Note that for a small array like this, the speed up is not significant, you may even have got a slow down, why? Have a
-think as we go through the final main step on how to speed up code.
+think as we go through the final main step on how to speed up code. 
+
+For larger problems with larger arrays, speeding up code using `cnp` arrays are recommended!
 
 ### Compiler directives
 
@@ -465,6 +467,41 @@ $ cython -X boundscheck=True ...
   @cython boundscheck(False)
 ~~~
 {: .language-python}
+
+Let's see how this applies in our powers example.
+
+~~~
+import numpy as np # Normal NumPy import
+cimport numpy as cnp # Import for NumPY C-API
+
+cimport cython
+
+@cython.boundscheck(False) # turns off 
+@cython.wraparound(False)
+
+def powers_array_cy(int N, int power): # number of 
+    cdef cnp.ndarray[cnp.int_t, ndim=2] arr
+    cdef int M
+    M = N*N
+    arr = np.arange(M).reshape((N, N))
+
+    for i in range(N):
+        for j in range(N):
+            arr[i,j] = i**j
+    return(arr[power]) # returns the ascending powers
+
+%time powers_array_cy(15,4)
+~~~
+{: .language-python}
+
+~~~
+CPU times: user 166 µs, sys: 80 µs, total: 246 µs
+Wall time: 238 µs
+array([        1,         4,        16,        64,       256,      1024,
+            4096,     16384,     65536,    262144,   1048576,   4194304,
+        16777216,  67108864, 268435456])
+~~~
+{: .output}
 
 ## Typing and Profiling
 
@@ -524,8 +561,162 @@ To run the profile in Jupyter, we can use the cell magics `%prun func()`
 > 
 {: .challenge}
 
-
-
 ## Acceleration Case Study: Julia Set
+
+Now we will look at a more complex example, the Julia set. This is also covered in the 
+[Jupyter notebook](../files/03-Cython/03-Cython.ipynb). 
+
+~~~
+import matplotlib.pyplot as plt
+import time
+import numpy as np
+from numpy import random
+%matplotlib inline
+
+mandel_timings = []
+
+
+def plot_mandel(mandel):
+    fig=plt.figure(figsize=(10,10))
+    ax = fig.add_subplot(111)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.imshow(mandel, cmap='gnuplot')
+    plt.savefig('mandel.png')
+
+def kernel(zr, zi, cr, ci, radius, num_iters):
+    count = 0
+    while ((zr*zr + zi*zi) < (radius*radius)) and count < num_iters:
+        zr, zi = zr * zr - zi * zi + cr, 2 * zr * zi + ci
+        count += 1
+    return count
+
+def compute_mandel_py(cr, ci, N, bound, radius=1000.):
+    t0 = time.time()
+    mandel = np.empty((N, N), dtype=int)
+    grid_x = np.linspace(-bound, bound, N)
+
+    for i, x in enumerate(grid_x):
+        for j, y in enumerate(grid_x):
+            mandel[i,j] = kernel(x, y, cr, ci, radius, N)
+    return mandel, time.time() - t0
+
+def python_run():
+    kwargs = dict(cr=0.3852, ci=-0.2026,
+              N=500,
+              bound=1.2)
+    print("Using pure Python")
+    mandel_func = compute_mandel_py       
+    mandel_set, runtime = mandel_func(**kwargs)
+    print("Mandelbrot set generated in {} seconds\n".format(runtime))
+    plot_mandel(mandel_set)
+    mandel_timings.append(runtime)
+
+%time python_run()
+~~~
+{: .language-python}
+
+~~~
+Using pure Python
+Mandelbrot set generated in 22.584877729415894 seconds
+
+CPU times: user 22.5 s, sys: 144 ms, total: 22.7 s
+Wall time: 22.7 s
+~~~
+{: .output}
+
+<p align="center"><img src="../fig/notebooks/julia_set.png" width="80%"/></p>
+
+
+> ## Optimise the Julia set
+>
+> As mentioned, this pure python code is in need of optimisation. Conduct a step by step process to speed up the code.
+> The steps that you take, as well as the estimated execution times for `N=500` should be as follows.
+>
+> 1. Compilation with Cython - ~ 19 seconds
+> 2. Static type declarations - ~ 0.15 seconds
+> 3. Declaration as C function - ~ 0.13 seconds
+> 4. Fast Indexing and compiler directives - ~ 0.085 seconds
+>    - use `cimport`
+>    - look at the loops, is there a faster way of doing it?
+>
+> As you can see you might expect a speed up of roughly 250-300 times the original python code. The 
+> [Jupyter notebook](../files/03-Cython/03-Cython.ipynb) outlines the process well if you need it, but try it out
+> yourself. The solution is the final step.
+>
+> > ## Solution
+> >
+> > Feel free to continue experimenting, as you may still find a quicker method!
+> > 
+> > ~~~
+> > import numpy as np
+> > import time
+> > cimport numpy as cnp
+> > 
+> > from cython cimport boundscheck, wraparound
+> > 
+> > @wraparound(False)
+> > @boundscheck(False)
+> > 
+> > cdef int kernel(double zr, double zi, double cr, double ci, 
+> >            double radius, int num_iters):
+> >     cdef int count = 0
+> >     while ((zr*zr + zi*zi) < (radius*radius)) and count < num_iters:
+> >         zr, zi = zr * zr - zi * zi + cr, 2 * zr * zi + ci
+> >         count += 1
+> >     return count
+> > 
+> > def compute_mandel_cyt(cr, ci, N, bound, radius=1000.):
+> >     t0 = time.time()
+> >     
+> >     cdef cnp.ndarray[cnp.int_t, ndim=2] mandel
+> >     mandel = np.empty((N, N), dtype=int)
+> >     
+> >     cdef cnp.ndarray[cnp.double_t, ndim=1] grid_x
+> >     grid_x = np.linspace(-bound, bound, N)
+> >     
+> >     cdef:
+> >         int i, j
+> >         double x, y
+> >     
+> >     for i in range(N):
+> >         for j in range(N):
+> >             x = grid_x[i]
+> >             y = grid_x[j]
+> >             
+> >             mandel[i,j] = kernel(x, y, cr, ci, radius, N)
+> >     return mandel, time.time() - t0
+> > ~~~
+> > {: .language-python}
+> {: .solution}
+{: .challenge}
+
+~~~
+def speed_run():
+    kwargs = dict(cr=0.3852, ci=-0.2026,
+              N=2000,
+              bound=0.12)
+    mandel_func = compute_mandel_cyt
+    mandel_set, runtime = mandel_func(**kwargs)
+    print("Mandelbrot set generated: \n")
+    print("Using advanced techniques: {}\n".format(runtime))
+    plot_mandel(mandel_set)
+    print("Assuming the same speed up factor, our original code would take", (speed_up_factor*runtime)/60, "minutes")
+
+speed_run()
+~~~
+{: .language-python}
+
+~~~
+Mandelbrot set generated: 
+
+Using advanced techniques: 9.067986965179443
+
+Assuming the same speed up factor, our original code would take 39.29461018244425 minutes
+~~~
+{: .output}
+
+<p align="center"><img src="../fig/notebooks/julia_set2.png" width="80%"/></p>
+
 
 {% include links.md %}
