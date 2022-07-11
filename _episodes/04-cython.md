@@ -505,7 +505,7 @@ array([        1,         4,        16,        64,       256,      1024,
 
 ## Typing and Profiling
 
-For anyone new to Cython and the concept of declaring types, there is a tendancy to 'type' everything in sight. This 
+For anyone new to Cython and the concept of declaring types, there is a tendency to 'type' everything in sight. This 
 reduces readability and flexibility and in certain situations, even slow things down in some circumstances, such as 
 what we saw in the previous code block. We have unnecessary typing
 
