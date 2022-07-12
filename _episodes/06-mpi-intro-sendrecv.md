@@ -400,9 +400,9 @@ The incorrect ordering of sends and receives can result in a deadlock.
 
 ## Case Study Parallel sum
 
-Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, P_0_ and
-$P_{1}$. Half of our array is sent to $P_{1}$, and from there $P_{0}$ and $P_{1}$ independently sum their segments. 
-From there, the summed array needs to be reduced, i.e. put back together again, from which $P_{0}$ then sums the 
+Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, P0 and
+P1. Half of our array is sent to P1, and from there P0 and P1 independently sum their segments. 
+From there, the summed array needs to be reduced, i.e. put back together again, from which P0 then sums the 
 partial sums.
 
 <p align="center"><img src="../fig/notebooks/3.2.4.png" width="15%"/></p>
@@ -411,37 +411,37 @@ partial sums.
 
 <p align="center"><img src="../fig/notebooks/3.2.4.2.png" width="40%"/></p>
 
-$P_{1}$ posts a **receive** to **receive** *half* of the array **FROM** $P_{0}$
+P1 posts a **receive** to **receive** *half* of the array **FROM** P0
 
 **Step 1.2**: Send operation in scatter
 
 <p align="center"><img src="../fig/notebooks/3.2.4.3.png" width="40%"/></p>
 
-$P_{0}$ posts a **send** to **send** the lower half of the array **TO** $P_{1}$
+P0 posts a **send** to **send** the lower half of the array **TO** P1
 
 **Step 2**: Compute the sum in parallel
 
 <p align="center"><img src="../fig/notebooks/3.2.4.4.png" width="40%"/></p>
 
-$P_{0}$ & $P_{1}$ compute their parallel sums and stores them locally
+P0 & P1 compute their parallel sums and stores them locally
 
 **Step 3.1**: **Receive** operation in reduction
 
 <p align="center"><img src="../fig/notebooks/3.2.4.5.png" width="40%"/></p>
 
-$P_{0}$ posts a **receive** to **receive** the partial sum
+P0 posts a **receive** to **receive** the partial sum
 
 **Step 3.2**: **Send** operation in reduction
 
 <p align="center"><img src="../fig/notebooks/3.2.4.6.png" width="40%"/></p>
 
-$P_{1}$ posts a **send** to **send** partial sum
+P1 posts a **send** to **send** partial sum
 
 **Step 4**: Compute the final answer.
 
 <p align="center"><img src="../fig/notebooks/3.2.4.7.png" width="40%"/></p>
 
-$P_{0}$ sums the partial sums
+P0 sums the partial sums
 
 > ## Parallel sum implementation
 > 
