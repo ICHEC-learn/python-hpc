@@ -400,12 +400,12 @@ The incorrect ordering of sends and receives can result in a deadlock.
 
 ## Case Study Parallel sum
 
-Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, P<sub>0<sub/> and
+Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, P<sub>0<sub\> and
 $P_{1}$. Half of our array is sent to $P_{1}$, and from there $P_{0}$ and $P_{1}$ independently sum their segments. 
 From there, the summed array needs to be reduced, i.e. put back together again, from which $P_{0}$ then sums the 
 partial sums.
 
-<p align="center"><img src="../fig/notebooks/3.2.4.png" width="20%"/></p>
+<p align="center"><img src="../fig/notebooks/3.2.4.png" width="15%"/></p>
 
 **Step 1.1**: Receive operation in scatter
 
