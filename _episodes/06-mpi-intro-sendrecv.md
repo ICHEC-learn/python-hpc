@@ -22,7 +22,7 @@ keypoints:
 
 ## Processes vs Threads
 
-We are now looking at the true way to acheive parallelism in Python, and HPC, which is MPI, but before we look into
+We are now looking at the true way to achieve parallelism in Python, and HPC, which is MPI, but before we look into
 this in more detail, we need to have a clear understanding of the differences between a thread and a process.
 
 Let's take the example of a keyboard when you are typing. One hand deals with one side of the keyboard, the other hand
@@ -35,14 +35,14 @@ In more technical terms, a thread is:
 - Lightweight operation that use the memory of the process they belong to
 - Threads share the same memory with other threads of the same process
 
-<p align="center"><img src="../fig/notebooks/Threads.png" width="60%"/></p>
+<p align="center"><img src="../fig/notebooks/Threads.png" width="40%"/></p>
 
 In comparison, a process is:
 - An instance of a program running on a computer
 - Heavyweight operation as every process has its own memory space
 - Processes don't share the memory with other processes
 
-<p align="center"><img src="../fig/notebooks/Process.png" width="60%"/></p>
+<p align="center"><img src="../fig/notebooks/Process.png" width="40%"/></p>
 
 
 MPI works with processes, each process can be considered as a core on a machine. Most desktop machines have between 4
@@ -281,7 +281,7 @@ When it comes to sends and receives, there are two main types.
 appear showing that the message is sent, and another that it has been received (followed by them turning blue showing 
 it has been read). This is known as a synchronous send, as you, the sender knows that the message has been received.
 
-**Buffered/Asynchronous Send:** An asynchronous send is analagous to sending a message in the mail. You, the sender
+**Buffered/Asynchronous Send:** An asynchronous send is analogous to sending a message in the mail. You, the sender
 know that the message has left, but do not know whether it has been or will be received.
 
 We will now move onto an example that uses send and receive, and we will run this with **4 ranks**.
@@ -400,12 +400,12 @@ The incorrect ordering of sends and receives can result in a deadlock.
 
 ## Case Study Parallel sum
 
-Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, $P_{0}$ and
+Let us walk through a parallel sum case study. The idea is that we scatter our data between two processes, P<sub>0<sup/> and
 $P_{1}$. Half of our array is sent to $P_{1}$, and from there $P_{0}$ and $P_{1}$ independently sum their segments. 
 From there, the summed array needs to be reduced, i.e. put back together again, from which $P_{0}$ then sums the 
 partial sums.
 
-<p align="center"><img src="../fig/notebooks/3.2.4.png" width="40%"/></p>
+<p align="center"><img src="../fig/notebooks/3.2.4.png" width="10%"/></p>
 
 **Step 1.1**: Receive operation in scatter
 
@@ -538,7 +538,7 @@ comm.Sendrecv(data, dest=dest, recvbuf=buffer, source=source)
 
 print('rank ', rank, ' receive buffer: ', buffer)
 ~~~
-{ .language-python}
+{: .language-python}
 
 Running this code with **2 processes** produces the following output.
 
