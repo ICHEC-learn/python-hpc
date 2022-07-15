@@ -656,6 +656,7 @@ if rank == 0: comm.bcast(...)
 
 - Assuming that all processes making a collective call would complete at the same time.
 - Using the input buffer as the output buffer:
+
 ~~~
 comm.Scatter(a, a, MPI.SUM)
 ~~~
