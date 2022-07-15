@@ -80,7 +80,7 @@ if rank == 0:
 
 elif rank == 1:
     data = np.empty(size, dtype=float)
-    # post a recieve
+    # post a receive
     req = comm.Irecv(data, source=0)
     # ... do something else ...
     calculate_something(rank)
@@ -273,6 +273,7 @@ problems you may encounter.
 > >    sum += rcv_buf
 > > print(f"PE{my_rank}:\tSum = {sum}")
 > > ~~~
+> > {: .language-python}
 > {: .solution}
 {: .challenge}
 
@@ -569,7 +570,7 @@ print(data)
 # Gather the value of rank from each rank, then send to rank 0
 n = comm.reduce(rank, root=0)
 
-# Gather ther NumPy array from each rank, then send to rank 0
+# Gather the NumPy array from each rank, then send to rank 0
 buffer = np.zeros(10, dtype=float)
 comm.Reduce(data, buffer, root=0)
 
@@ -658,12 +659,12 @@ if rank == 0: comm.bcast(...)
 ~~~
 comm.Scatter(a, a, MPI.SUM)
 ~~~
-{; .language-python}
+{: .language-python}
 
 > ## An easier look at collectives
 > 
 > Head to the Jupyter notebook [here](../files/05-MPI/05-Exercises-MPI.ipynb) and scroll down to 
-> **Easier Exercise: Collective Commnunication**, and work on an easier script that utilises `Broadcast`, `Scatter`,
+> **Easier Exercise: Collective Communication**, and work on an easier script that utilises `Broadcast`, `Scatter`,
 > `Gather`, and `Reduce`.
 >
 > > ## Solution
