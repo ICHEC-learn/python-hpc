@@ -21,12 +21,12 @@ keypoints:
 ## Dask
 
 Dask is a framework that covers many things which were not possible even a few years ago. It allows us to create 
-mutliple tasks with a minimum of effort. There are different aspects to Dask of which we will cover just a few during
+multiple tasks with a minimum of effort. There are different aspects to Dask of which we will cover just a few during
 this lesson. Dask is integrated with different projects such as `pandas`, `numpy` and `scipy`. This allows 
 parallelisation of for example `scipy` functions with minimum changes to the python code. Some of the projects have
 their own multithreaded functions, so Dask is not essential.
 
-Dask can work very well in notebook enviroments, as it gives you a good visual representation as to what is going on.
+Dask can work very well in notebook environments, as it gives you a good visual representation as to what is going on.
 You can open up the [notebook](../files/) for this episode.
 
 We will first look at "Dask Distributed". The first step is to create a set of workers with a scheduler. Here we are
@@ -234,9 +234,7 @@ Running this will produce the following output, now with 5 tasks.
 
 <p align="center"><img src="../fig/dask-calcpi-graph-2.png" width="50%"/></p>
 
-
-
-> ## Continuing with Pi calcualtion
+> ## Continuing with Pi calculation
 >
 > Run the same `calculate_pi` function for array sizes 1GB-5GB. Time the numpy only version against when using dask. Do
 > you notice anything? Modify the codes in the [notebook](../files/06-Dask/exercises/06-Dask_Array_Exercise1.ipynb)
@@ -342,7 +340,7 @@ That's the NumPy version. For dask we will set up an array of the same size, but
 a_da = da.arange(1, 50, 3, chunks=5)
 a_da
 ~~~
-{: language-python}
+{: .language-python}
 
 As an output we get a diagram.
 
@@ -401,7 +399,7 @@ array([   1,   16,  100,  169,  256,  361,  484,  625,  784,  961,
 ~~~
 {: .output}
 
-You can see that the parallelisation is seemless, you don't really need to understand the parallelisation strategy or
+You can see that the parallelisation is easy, you don't really need to understand the parallelisation strategy or
 anything at all! A numpy array is returned. There are other operations that can be done.
 
 Dask arrays support a large portion of the NumPy interface such as:
@@ -421,7 +419,7 @@ you and your machine are capable of.
 ### Blocked Algorithms
 
 Dask arrays are implemented using blocked algorithms. These algorithms break up a computation on a large array into 
-many computations on smaller peices of the array. This minimizes the memory load (amount of RAM) of computations and
+many computations on smaller pieces of the array. This minimizes the memory load (amount of RAM) of computations and
 allows for working with larger-than-memory datasets in parallel. Dask supports a large protion of the numpy functions.
 
 The below will generate a random array, and it will automatically create the tasks, and from there the sums will be
@@ -671,7 +669,7 @@ if __name__ == '__main__':
 ~~~
 {: .language-python}
 
-The changes come in the main body of the code, when we come to initialise it. You will still need to intialise the 
+The changes come in the main body of the code, when we come to initialise it. You will still need to initialise the 
 scheduler and workers by calling `Client`. However this time it is called without any arguments. The system of MPI
 processes is created by calling `intialize`. You can see that the parameters are setup at this call and not through
 `Client()`. One thing you may notice is that the number of workers has not been set. This is set at execute time.
