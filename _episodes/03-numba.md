@@ -188,4 +188,109 @@ therefore get huge speed ups with minimum effort.
 
 ## Demonstrating modes
 
+### `nopython=True`
+
+Below we have a small function that determines whether a function is a prime number, then generate an array of random
+numbers. We are goinf to use a decorator for this example, which itself is a function that takes another function as
+its argument, and returns another function. This is as an alternative for using `@jit`.
+
+~~~
+def is_prime(n):
+    if n <= 1:
+        raise ArithmeticError('%s <= 1' %n)
+    if n == 2 or n == 3:
+        return True
+    elif n % 2 == 0:
+        return False
+    else:
+        n_sqrt = math.ceil(math.sqrt(n))
+        for i in range(3, n_sqrt):
+            if n % i == 0:
+                return False
+
+    return True
+
+numbers = np.random.randint(2, 100000, size=10)
+
+is_prime_jit = jit(is_prime)
+~~~
+{: language-python}
+
+Now we will time and run the function with pure python, jitted including compilation time and then purely with jit.
+
+~~~
+print("Pure Python")
+%time p1 = [is_prime(x) for x in numbers]
+print("")
+print("Jitted including compilation")
+%time p2 = [is_prime_jit(x) for x in numbers]
+print("")
+print("Jitted")
+%time p2 = [is_prime_jit(x) for x in numbers]
+~~~
+{: .language-python}
+
+> ## Warning explanation
+> 
+> Upon running this, you will get an output with a large warning, amongst it will say,
+> 
+> ~~~
+> Pure Python
+> CPU times: user 798 µs, sys: 0 ns, total: 798 µs
+> Wall time: 723 µs
+> 
+> Jitted including compilation
+> ...
+> ... Compilation is falling back to object with WITH looplifting enabled because Internal error in pre-inference
+> rewriting pass encountered during compilation of function "is_prime" due to ... 
+> ...
+> 
+> CPU times: user 482 ms, sys: 16.9 ms, total: 499 ms
+> Wall time: 496 ms
+> 
+> Jitted
+> CPU times: user 43 µs, sys: 0 ns, total: 43 µs
+> Wall time: 46 µs
+> ~~~
+> {: .output}
+> 
+> This still runs as we would expect, and if we run it again, the warning disappears. 
+{: .callout}
+
+If we change the above code and add one of our toggles so that the jitted line becomes;
+
+~~~
+is_prime_jit = jit(nopython=True)(is_prime)
+~~~
+{: .language-python}
+
+We will get a full error, because it **CANNOT** run in `nopython` mode. However, by setting this mode to `True`, you
+can highlight where in the code you need to speed it up. So how can we fix it?
+
+If we refer back to the code, and the error, it arises in the notation in Line 3 for the `ArithmeticError`, or more
+specifically `'%s <= 1'`. This is a python notation, and to translate it into pure machine code, it needs the python
+interpreter. We can change it to `'n <= 1'`, and when rerun we get no warnings or error.
+
+Although what we have just done is possible without `nopython`, it is a bit slower, and worth bearing in mind.
+
+`@jit(nopython=True)` is equivalent to `@njit`. The behaviour of the `nopython` compilation mode is to essentially 
+compile the decorated function so that it will run entirely without the involvement of the Python interpreter. If it
+can't do that an exception is raised. These exceptions usually indicate places in the function that need to be modified
+in order to achieve better-than-Python performance. Therefore, we strongly recommend always using `nopython=True`. This
+supports a subset of python but runs at C/C++/Fortran speeds.
+
+Object mode (`forceobj=True`) extracts loops and compiles them in `nopython` mode which useful for functions that are 
+bookended by uncompilable code but have a compilable core loop, this is also done automatically. It supports nearly all
+of python but cannot speed up by a large factor.
+
+## Mandelbrot example
+
+Let's now create an example of the Mandelbrot set, this version more suited to a Julia set in reality. We won't go into
+full details on what is going on in the code, but there is a `while` loop in the `kernel` function that is causing this
+to be slow.
+
+~~~
+
+~~~
+
 {% include links.md %}
