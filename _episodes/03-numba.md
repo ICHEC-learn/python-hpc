@@ -290,7 +290,223 @@ full details on what is going on in the code, but there is a `while` loop in the
 to be slow.
 
 ~~~
+import numpy as np
+import math
+import time
+import numba
+from numba import jit, njit
+import matplotlib.pyplot as plt
+
+mandel_timings = []
+
+def plot_mandel(mandel):
+    fig=plt.figure(figsize=(10,10))
+    ax = fig.add_subplot(111)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.imshow(mandel, cmap='gnuplot')
+    plt.savefig('mandel.png')
+    
+def kernel(zr, zi, cr, ci, radius, num_iters):
+    count = 0
+    while ((zr*zr + zi*zi) < (radius*radius)) and count < num_iters:
+        zr, zi = zr * zr - zi * zi + cr, 2 * zr * zi + ci
+        count += 1
+    return count
+
+def compute_mandel_py(cr, ci, N, bound, radius=1000.):
+    t0 = time.time()
+    mandel = np.empty((N, N), dtype=int)
+    grid_x = np.linspace(-bound, bound, N)
+
+    for i, x in enumerate(grid_x):
+        for j, y in enumerate(grid_x):
+            mandel[i,j] = kernel(x, y, cr, ci, radius, N)
+    return mandel, time.time() - t0
+
+def python_run():
+    kwargs = dict(cr=0.3852, ci=-0.2026,
+              N=400,
+              bound=1.2)
+    print("Using pure Python")
+    mandel_func = compute_mandel_py       
+    mandel_set = mandel_set, runtime = mandel_func(**kwargs)
+    
+    print("Mandelbrot set generated in {} seconds".format(runtime))
+    plot_mandel(mandel_set)
+    mandel_timings.append(runtime)
+
+python_run()
+
+print(mandel_timings)
+~~~
+{: .language-python}
+
+For larger values of `N` in `python_run`, we recommend submitting this to the compute nodes. For more information on
+submitting jobs on an HPC, you can consult our [intro-to-hpc](https://ichec-learn.github.io/intro-to-hpc/) course.
+
+For the moment however we can provide you with the job script in an exercise.
+
+> ## Submit a job to the queue
+>
+> Below is a job script that we have prepared for you. All you need to do is run it! This script will run the code
+> above, which can be written to a file called `mandel.py`. Your instructor will inform you of the variables to use
+> in the values `$ACCOUNT`, `$PARTITION`, and `$RESERVATION`. 
+> 
+> ~~~
+> #!/bin/bash
+> #SBATCH --nodes=1
+> #SBATCH --time=00:10:00
+> #SBATCH -A $ACCOUNT
+> #SBATCH --job-name=mandel
+> #SBATCH -p $PARTITION
+> #SBATCH --reservation=$RESERVATION
+> 
+> module purge
+> module load conda
+> module list
+> 
+> source activate numba
+> 
+> cd $SLURM_SUBMIT_DIR
+> 
+> python mandel.py
+> 
+> exit 0
+> ~~~
+> {: .language-bash}
+>
+> To submit the job, you will need the following command. It will return a job ID.
+> 
+> ~~~
+> $ sbatch mandel_job.sh
+> ~~~
+> {: .language-bash}
+> 
+> Once the job has run successfully, run it again but this time, use `njit` on the `kernel` function.
+>
+> > ## Output
+> >
+> > Check the directory where you submitted the command and you will have a file called `slurm-123456.out`, where the
+> > `123456` will be replaced with your job ID as returned in the previous example. View the contents of the file and
+> > it will give you an output returning the time taken for the mandelbrot set. For `N = 400` it will be roughly 10-15
+> > seconds. A `.png` file will also be generated.
+> > 
+> > To view the `njit` solution, head to the file [here](../files/02-Numba/exercise/02-Numba-Exercises-Solutions.ipynb).
+> {: .solution}
+{: .challenge}
+
+Now, let's see if we can speed it up more by looking at the compute function.
 
 ~~~
+compute_mandel_njit_jit = njit()(compute_mandel_njit)
+
+def njit_njit_run():
+    kwargs = dict(cr=0.3852, ci=-0.2026,
+              N=400,
+              bound=1.2)
+    print("Using njit kernel and njit compute")
+    mandel_func = compute_mandel_njit_jit      
+    mandel_set = mandel_set, runtime = mandel_func(**kwargs)
+    
+    print("Mandelbrot set generated in {} seconds".format(runtime))
+
+njit_njit_run()
+~~~
+{: .language-python}
+
+> ## `njit` the compute function
+>
+> Add the modifications to your code and submit the job. What kind of speed up do you get?
+>
+> > ## Solution
+> >
+> > Not even a speed-up, an error, because there are items in that function that Numba does not like! More specifically
+> > if we look at the error;
+> > 
+> > ~~~
+> > ...
+> > Unknown attribute 'time' of type Module ...
+> > ...
+> > ~~~
+> > {: .output}
+> >
+> > This is a python object, so we need to remove the `time.time` function.
+> {: .solution}
+{: .challenge}
+
+Now let's modify the code to ensure it is timed outside of the main functions. Running it again will produce another
+error about data types, so these will also need to be fixed.
+
+> ## Fix the errors!
+> 
+> Change all the instances of `dtype=int` to `dtype=np.int_` in `compute_mandel` functions throughout.
+> 
+> > ## Solution
+> >
+> > ~~~
+> > import matplotlib.pyplot as plt
+> > 
+> > mandel_timings = []
+> > 
+> > def plot_mandel(mandel):
+> >     fig=plt.figure(figsize=(10,10))
+> >     ax = fig.add_subplot(111)
+> >     ax.set_aspect('equal')
+> >     ax.axis('off')
+> >     ax.imshow(mandel, cmap='gnuplot')
+> > 
+> > def kernel(zr, zi, cr, ci, radius, num_iters):
+> >     count = 0
+> >     while ((zr*zr + zi*zi) < (radius*radius)) and count < num_iters:
+> >         zr, zi = zr * zr - zi * zi + cr, 2 * zr * zi + ci
+> >         count += 1
+> >     return count
+> > 
+> > kernel_njit = njit(kernel)
+> > 
+> > def compute_mandel_njit(cr, ci, N, bound, radius=1000.):
+> >     mandel = np.empty((N, N), dtype=np.int_)
+> >     grid_x = np.linspace(-bound, bound, N)
+> > 
+> >     for i, x in enumerate(grid_x):
+> >         for j, y in enumerate(grid_x):
+> >             mandel[i,j] = kernel_njit(x, y, cr, ci, radius, N)
+> >     return mandel
+> > 
+> > compute_mandel_njit_jit = njit()(compute_mandel_njit)
+> > 
+> > def njit_njit_run():
+> >     kwargs = dict(cr=0.3852, ci=-0.2026,
+> >               N=200,
+> >               bound=1.2)
+> >     print("Using njit kernel and njit compute")
+> >     mandel_func = compute_mandel_njit_jit      
+> >     mandel_set = mandel_func(**kwargs)
+> >    
+> >     plot_mandel(mandel_set)
+> > 
+> > njit_njit_run()
+> > ~~~
+> > {: .language-python}
+> > 
+> > We recommend trying this out in the [Jupyter notebook](../files/02-Numba/02-Numba.ipynb) as well for your own reference
+> > 
+> > ~~~
+> > t0 = time.time()
+> > njit_njit_run()
+> > runtime = time.time() - t0
+> > mandel_timings.append(runtime)
+> > print(mandel_timings)
+> > ~~~
+> > {: .language-python}
+> {: .solution}
+{: .challenge}
+
+### `cache=True`
+
+The point of using `cache=True` is to avoid repeating the compile time of large and complex functions at each run of a
+script. In thw example below the function is simple and the time saving is limited but for a script with a number of
+more complex functions, using cache can significantly reduce the run-time.
 
 {% include links.md %}
