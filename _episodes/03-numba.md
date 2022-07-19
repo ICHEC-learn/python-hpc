@@ -72,11 +72,11 @@ Looks like a lot, but let's go through the different options.
 - Modes: Numba has two modes; `nopython`, `forcobj`. Numba will infer the argument types at call time, and generate
   optimized code based on this information. If there is python object, the object mode will be used by default.
 
-- `nogil=True`: Releases the global interperter lock inside the compiled function. This is one of the main reasons 
+- `nogil=True`: Releases the global interpreter lock inside the compiled function. This is one of the main reasons 
   python is considered as slow. However this only applies in `nopython` mode at present.
 
 - `cache=True`: Enables a file-based cache to shorten compilation times when the function was already compiled in a
-  previous invocation. It cannot be used in conjuction with `parallel=True`.
+  previous invocation. It cannot be used in conjunction with `parallel=True`.
 
 - `parallel=True`: Enables the automatic parallelization of a number of common Numpy constructs.
 
@@ -214,7 +214,7 @@ numbers = np.random.randint(2, 100000, size=10)
 
 is_prime_jit = jit(is_prime)
 ~~~
-{: language-python}
+{: .language-python}
 
 Now we will time and run the function with pure python, jitted including compilation time and then purely with jit.
 
@@ -506,7 +506,25 @@ error about data types, so these will also need to be fixed.
 ### `cache=True`
 
 The point of using `cache=True` is to avoid repeating the compile time of large and complex functions at each run of a
-script. In thw example below the function is simple and the time saving is limited but for a script with a number of
+script. In the example below the function is simple and the time saving is limited but for a script with a number of
 more complex functions, using cache can significantly reduce the run-time.
+
+~~~
+def is_prime(n):
+    if n <= 1:
+        raise ArithmeticError('n <= 1')
+    if n == 2 or n == 3:
+        return True
+    elif n % 2 == 0:
+        return False
+    else:
+        n_sqrt = math.ceil(math.sqrt(n))
+        for i in range(3, n_sqrt):
+            if n % i == 0:
+                return False
+
+    return True
+~~~
+{: .language-python}
 
 {% include links.md %}

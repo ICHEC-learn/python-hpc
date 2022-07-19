@@ -190,7 +190,7 @@ Don't worry if your C knowledge isn't up to scratch, but the main points are as 
 - Free the memory that we have reserved. 
 
 An individual thread is identified through the block ID and the thread ID within the block. In the example below, 
-which is 1-dimensional (1x5), we ahve 3 blocks and 15 threads each. Within each block our `threadIdx` are 0-4. To get
+which is 1-dimensional (1x5), we have 3 blocks and 15 threads each. Within each block our `threadIdx` are 0-4. To get
 the global `threadId` we need to perform the sum as shown.
 
 <p align="center"><img src="../fig/notebooks/CUDAmodelThreads.png" width="40%"/></p>
@@ -293,7 +293,7 @@ array. If we have more threads than number of elements, we also need to check fo
 
 So far we have been using the GPUs through cuda code. PyCUDA is a framework which allows us to access the GPU form a
 python environment. There are different ways to achieve this. First we will look at GPUArrays, as we can copy arrays
-from the host to device, perform basic operations then return the data to te host.
+from the host to device, perform basic operations then return the data to the host.
 
 The code below does the same as those above. Much of the work is hidden, like python itself. Also you can view the 
 data both on the CPU and GPU. The distinction between what is on the GPU and CPU is blurred which may cause problems.
