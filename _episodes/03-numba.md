@@ -507,7 +507,8 @@ error about data types, so these will also need to be fixed.
 
 The point of using `cache=True` is to avoid repeating the compile time of large and complex functions at each run of a
 script. In the example below the function is simple and the time saving is limited but for a script with a number of
-more complex functions, using cache can significantly reduce the run-time.
+more complex functions, using cache can significantly reduce the run-time. We have removed the python object that 
+caused the error. We will 
 
 ~~~
 def is_prime(n):
@@ -524,7 +525,354 @@ def is_prime(n):
                 return False
 
     return True
+
+is_prime_njit = njit()(is_prime)
+is_prime_njit_cached = njit(cache=True)(is_prime)
+
+numbers = np.random.randint(2, 100000, size=1000)
 ~~~
 {: .language-python}
+
+> ## Compare the timings for `cache`
+>
+> Run the function 4 times so that you get results for:
+> - Not cached including compilation
+> - Not cached 
+> - Cached including compilation
+> - Cached
+>
+> > ## Output
+> > 
+> > You may get a result similar to below.
+> > ~~~
+> > Not cached including compilation
+> > CPU times: user 117 ms, sys: 11.7 ms, total: 128 ms
+> > Wall time: 134 ms
+> > 
+> > Not cached
+> > CPU times: user 0 ns, sys: 381 µs, total: 381 µs
+> > Wall time: 386 µs
+> > 
+> > Cached including compilation
+> > CPU times: user 2.84 ms, sys: 1.95 ms, total: 4.79 ms
+> > Wall time: 11.8 ms
+> > 
+> > Cached
+> > CPU times: user 378 µs, sys: 0 ns, total: 378 µs
+> > Wall time: 382 µs
+> > ~~~
+> > {: .output}
+> >
+> > It may not be as fast as when its been compiled in the same environment you are running your program in, but can
+> > still be a considerable speed up for bigger scripts. Usually to show the cahce working, you need to restart the 
+> > whole kernel and subsquently reload the modules, functions and variables.
+> >
+> {: .solution}
+{: .challenge}
+
+### Eager Compilation using function signatures
+
+This speeds up compilation time faster than cache, hence the term "eager". It can be helpful if you know the types of
+input and ouput values of your function before you compile it. Although python can be fairly lenient if you are not 
+concerned about types, at the machine level it makes a big difference. We will look more into the importance of typing
+in upcoming episodes, but for now, let's look again at our prime example. We do not need to edit the code itself, 
+merely the njit.
+
+To enable eager compilation, we need to specify the input and output types. For `is_prime`, the output is a boolean,
+and the input is an integer, we have to specify that as well. It needs to be declared in the form `output(input)`.
+Types should be ordered from smaller to higher precision, i.e. `int32`, `int64`. We have to cover for both methods of
+precision.
+
+~~~
+is_prime_eager = njit(['boolean(int32)','boolean(int64)' ])(is_prime)
+~~~
+{: .language-python}
+
+> ## Compare the timings for eager compilation
+>
+> Run the function 4 times so that you get results for:
+> - Just njit including compilation
+> - Just njit
+> - Eager including compilation
+> - Eager
+>
+> > ## Output
+> > 
+> > You may expect an output similar to the following.
+> > 
+> > ~~~
+> > Just njit including compilation
+> > CPU times: user 97.2 ms, sys: 2.19 ms, total: 99.4 ms
+> > Wall time: 100 ms
+> > 
+> > Just njit
+> > CPU times: user 3.6 ms, sys: 0 ns, total: 3.6 ms
+> > Wall time: 3.48 ms
+> > 
+> > Eager including compilation
+> > CPU times: user 3.61 ms, sys: 0 ns, total: 3.61 ms
+> > Wall time: 3.57 ms
+> > 
+> > Eager
+> > CPU times: user 3.42 ms, sys: 367 µs, total: 3.79 ms
+> > Wall time: 3.64 ms
+> > ~~~
+> > {: .output}
+> >
+> > Bear in mind these are small examples, but you can clearly see how much time that has shaved off this small 
+> > example .
+> >
+> {: .solution}
+{: .challenge}
+
+### `fastmath=True`
+
+The final one we will look at for `is_prime` is `fastmath=True`. This enables the use of otherwise unsafe floating
+point transforms. This means that it is possible to relax some numerical rigour with view of gaining additional 
+performance. As an example, it assumes that the arguments and result are not `NaN` or infinity values. Feel free to 
+investigate the [llvm docs](https://llvm.org/docs/LangRef.html#fast-math-flags). You have to be confident with the
+inputs of your code.
+
+~~~
+is_prime_njit_fmath = njit(fastmath=True)(is_prime)
+~~~
+{: .language-python}
+
+Running this, you may expect an timings output similar to below.
+
+~~~
+CPU times: user 3.75 ms, sys: 0 ns, total: 3.75 ms
+Wall time: 3.75 ms
+
+Fastmath including compilation
+CPU times: user 96 ms, sys: 477 µs, total: 96.5 ms
+Wall time: 93.9 ms
+
+Fastmath compilation
+CPU times: user 3.5 ms, sys: 0 ns, total: 3.5 ms
+Wall time: 3.41 ms
+~~~
+{: .output}
+
+> ## Toggling with toggles with Montecarlo
+>
+> Head to the Numba Exercise [Jupyter notebook](../files/02-Numba/exercise/02-Numba-Exercises.ipynb) and work on
+> Exercise 2. You should try out `@njit`, eager compilation, `cache` and `fastmath` on the MonteCarlo function 
+> and compare the timings you get. Feel free to submit larger jobs to the queue.
+> 
+> > ## Solution
+> > 
+> > The solution can be found in the notebook [here](../files/02-Numba/exercise/02-Numba-Exercises-Solutions.ipynb).
+> >
+> {: .solution}
+{: .challenge}
+
+### `parallel=True`
+
+We can also use Numba to parallelise our code by using `parallel=True` to use multi-core CPUs via threading. We can use
+`numba.prange` alongside `parallel=True` if you ahve for loops present in your code. As a default, the option is set to
+`False`, and doing so means that `numba.prange` has the same utility as `range`. We can set the default number of 
+threads with the following syntax. 
+
+~~~
+max_threads = numba.config.NUMBA_NUM_THREADS
+~~~
+{: .language-python}
+
+~~~
+def pi_montecarlo_python(n):
+    in_circle = 0
+    for i in range(n):
+        x, y = np.random.random(), np.random.random()
+        if x ** 2 + y ** 2 <= 1.0:
+            in_circle += 1
+        
+    return 4.0 * in_circle / n
+
+def pi_montecarlo_numpy(n):
+    in_circle = 0
+    x = np.random.random(n)
+    y = np.random.random(n)
+    in_circle = np.sum((x ** 2 + y ** 2) <= 1.0)
+        
+    return 4.0 * in_circle / n
+
+pi_montecarlo_python_njit = njit()(pi_montecarlo_python)
+
+pi_montecarlo_numpy_njit = njit()(pi_montecarlo_numpy)
+
+pi_montecarlo_python_parallel = njit(parallel=True)(pi_montecarlo_python)
+
+pi_montecarlo_numpy_parallel = njit(parallel=True)(pi_montecarlo_numpy)
+
+
+n = 1000000
+~~~
+{: .langugae-python}
+
+If the pure python version seems faster than numpy, there is no need for concern, as sometimes python + numba can turn
+out to be faster than numpy + numba. 
+
+> ## Explaining warnings
+>
+> If you run the above code, you may see that you get a warning saying:
+>
+> ~~~
+> ...
+> The keyword argument 'parallel=True' was specified but no transformation for parallel executing code was possible.
+> ...
+> ~~~
+> {: .output}
+> 
+> Running it again will remove the warning, but we will not get any speed-up. We will need to change the above code in
+> Line 3 from `for i in range(n):` to `for i in numba.prange(n):`.
+{: .callout}
+
+~~~
+njit_python including compilation
+CPU times: user 105 ms, sys: 4.66 ms, total: 110 ms
+Wall time: 105 ms
+
+njit_python
+CPU times: user 10.1 ms, sys: 0 ns, total: 10.1 ms
+Wall time: 9.93 ms
+
+njit_numpy including compilation
+CPU times: user 174 ms, sys: 7.61 ms, total: 181 ms
+Wall time: 179 ms
+
+njit_numpy
+CPU times: user 11.1 ms, sys: 4.3 ms, total: 15.4 ms
+Wall time: 15.2 ms
+
+njit_python_parallel including compilation
+CPU times: user 536 ms, sys: 29.1 ms, total: 565 ms
+Wall time: 480 ms
+
+njit_python_parallel
+CPU times: user 60.3 ms, sys: 8.65 ms, total: 68.9 ms
+Wall time: 3.2 ms
+
+njit_numpy_parallel including compilation
+CPU times: user 3.89 s, sys: 726 ms, total: 4.62 s
+Wall time: 789 s
+
+njit_numpy_parallel
+CPU times: user 53.1 ms, sys: 9.96 ms, total: 63 ms
+Wall time: 2.77 ms
+~~~
+{: .output}
+
+> ## Set the number of threads
+>
+> Increase the value of N and adjust the number of threads using `numba.set_num_threads(nthreads)`. What sort of
+> timings do you get. Are they what you would expect? Why?
+> 
+{: .challenge}
+
+> ## Diagnostics
+>
+> Using the command below:
+>
+> ~~~
+> pi_montecarlo_numpy_parallel.parallel_diagnostics(level=N)
+> ~~~
+> {: .language-python}
+>
+> You can get an understanding of what is going on under the hood. You can replace the value N for numbers between 1 
+> and 4. 
+>
+{: .callout}
+
+### Creating `ufuncs` using `numba.vectorize`
+
+A universal function (or `ufunc` for short) is a function that operates on ndarrays in an element-by-element fashion.
+So far we have been looking at just-in-time wrappers, these are “vectorized” wrappers for a function. For example 
+`np.add()` is a ufunc.
+
+There are two main types of ufuncs:
+- Those which operate on scalars, ufuncs (see @vectorize below).
+- Those which operate on higher dimensional arrays and scalars, these are “generalized universal functions” or gufuncs, 
+  such as `@guvectorize`.
+
+The` @vectorize` decorator allows Python functions taking scalar input arguments to be used as NumPy `ufuncs`. Creating
+a traditional NumPy ufunc involves writing some C code. Thankfully, Numba makes this easy. This decorator means Numba
+can compile a pure Python function into a `ufunc` that operates over NumPy arrays as fast as traditional ufuncs written
+in C. 
+
+The `vectorize()` decorator has two modes of operation:
+
+1. **Eager**, or decoration-time, compilation: If you pass one or more type signatures to the decorator, you will be 
+  building a Numpy universal function (ufunc). It is passed in the formw
+
+~~~
+output_type1(input_type1)
+output_type2(input_type12)
+# etc
+~~~
+{: .language-python}
+
+2. **Lazy**, or call-time, compilation: When not given any signatures, the decorator will give you a Numba dynamic
+  universal function (DUFunc) that dynamically compiles a new kernel when called with a previously unsupported input 
+  type.
+
+If you pass several signatures, beware that you have to pass the more specific signatures before least specific ones
+(e.g., single-precision floats before double-precision floats), otherwise type-based dispatching will not work as
+expected. eg (`int32`,`int64`,`float32`,`float64`)
+
+Here is a very simple example one with vectorization and the other with parallelisation as well.
+
+~~~
+numba.set_num_threads(max_threads)
+
+def numpy_sin(a, b):
+    return np.sin(a) + np.sin(b) + np.cos(a) - np.cos(b) + (np.sin(a))**2
+
+
+numpy_sin_vec = numba.vectorize(['int64(int64, int64)','float64(float64, float64)'])(numpy_sin)
+
+numpy_sin_vec_par = numba.vectorize(['int64(int64, int64)','float64(float64, float64)'],target='parallel')(numpy_sin)
+
+x = np.random.randint(0, 100, size=90000)
+y = np.random.randint(0, 100, size=90000)
+
+print("Just numpy")
+%time _ = numpy_sin(x, y)
+print("")
+print("Vectorised")
+%time _ = numpy_sin_vec(x, y)
+print("")
+print("Vectorised & parallelised")
+%time _ = numpy_sin_vec_par(x, y)
+~~~
+{: .language-python}
+
+~~~
+Just numpy
+CPU times: user 17.3 ms, sys: 4.08 ms, total: 21.4 ms
+Wall time: 20.1 ms
+
+Vectorised
+CPU times: user 14.9 ms, sys: 0 ns, total: 14.9 ms
+Wall time: 14.5 ms
+
+Vectorised & parallelised
+CPU times: user 86.5 ms, sys: 18.7 ms, total: 105 ms
+Wall time: 8.72 ms
+~~~
+{: .output}
+
+> ## Vectorisation
+> 
+> Head to the [Jupyter notebook](../files/02-Numba/exercise/02-Numba-Exercises.ipynb) and Exercise 3. Work on the 
+> `is_prime` function by utilising `njit`, `vectorize` and then vectorize it with the target set to `parallel`. Time
+> the results and compare the output.
+> 
+> > ## Solution
+> >
+> > The solution can be found in the notebook [here](../files/02-Numba/exercise/02-Numba-Exercises-Solutions.ipynb).
+> > 
+> {: .solution}
+{: .challenge}
 
 {% include links.md %}
