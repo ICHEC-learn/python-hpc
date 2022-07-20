@@ -564,8 +564,8 @@ numbers = np.random.randint(2, 100000, size=1000)
 > > {: .output}
 > >
 > > It may not be as fast as when its been compiled in the same environment you are running your program in, but can
-> > still be a considerable speed up for bigger scripts. Usually to show the cahce working, you need to restart the 
-> > whole kernel and subsquently reload the modules, functions and variables.
+> > still be a considerable speed up for bigger scripts. Usually to show the cache working, you need to restart the 
+> > whole kernel and subsequently reload the modules, functions and variables.
 > >
 > {: .solution}
 {: .challenge}
@@ -573,7 +573,7 @@ numbers = np.random.randint(2, 100000, size=1000)
 ### Eager Compilation using function signatures
 
 This speeds up compilation time faster than cache, hence the term "eager". It can be helpful if you know the types of
-input and ouput values of your function before you compile it. Although python can be fairly lenient if you are not 
+input and output values of your function before you compile it. Although python can be fairly lenient if you are not 
 concerned about types, at the machine level it makes a big difference. We will look more into the importance of typing
 in upcoming episodes, but for now, let's look again at our prime example. We do not need to edit the code itself, 
 merely the njit.
@@ -670,7 +670,7 @@ Wall time: 3.41 ms
 ### `parallel=True`
 
 We can also use Numba to parallelise our code by using `parallel=True` to use multi-core CPUs via threading. We can use
-`numba.prange` alongside `parallel=True` if you ahve for loops present in your code. As a default, the option is set to
+`numba.prange` alongside `parallel=True` if you have for loops present in your code. As a default, the option is set to
 `False`, and doing so means that `numba.prange` has the same utility as `range`. We can set the default number of 
 threads with the following syntax. 
 
@@ -708,7 +708,7 @@ pi_montecarlo_numpy_parallel = njit(parallel=True)(pi_montecarlo_numpy)
 
 n = 1000000
 ~~~
-{: .langugae-python}
+{: .language-python}
 
 If the pure python version seems faster than numpy, there is no need for concern, as sometimes python + numba can turn
 out to be faster than numpy + numba. 
