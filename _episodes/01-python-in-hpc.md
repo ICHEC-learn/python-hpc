@@ -1,7 +1,7 @@
 ---
 title: "Python in HPC"
-teaching: 10
-exercises: 0
+teaching: 15
+exercises: 5
 questions:
 - "Why would one use Python in High Performance Computing?"
 - "What is Python's reference counter and garbage collector?"
