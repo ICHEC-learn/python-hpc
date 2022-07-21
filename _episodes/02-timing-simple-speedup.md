@@ -713,68 +713,14 @@ array([1, 1, 1, ..., 1, 1, 1])
 ~~~
 {: .output}
 
-> ## Arrays and slicing 
+> ## Arrays, slicing and powers array
 >
-> Create arrays of zeros using `np.zeros`, then use slicing to obtain the following outputs:
->
-> A
-> $$\begin{bmatrix} 0 & 0 & 0 & 0 \\ 2 & 2 & 2 & 2 \\ 2 & 2 & 2 & 2 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
-> B
-> $$\begin{bmatrix} 0 & 0 & 0 & 0 \\ 0 & 2 & 2 & 0 \\ 0 & 2 & 2 & 0 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
-> C
-> $$\begin{bmatrix} 2 & 2 & 2 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 2 & 2 & 2 & 2 \end{bmatrix}$$
-> D
-> $$\begin{bmatrix} 2 & 0 & 0 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 2 & 0 & 0 & 2 \end{bmatrix}$$
+> Head to the [Jupyter notebook](../files/01-Fundamentals/01-Exercise-Fundamentals.ipynb) and do the NumPy exercises.
 >
 > > ## Solution
 > >
-> > ~~~
-> > # A
-> > a = np.zeros((4,4))
-> > a[1:3, :] = 2
-> > a
-> > 
-> > # B
-> > b = np.zeros((4,4))
-> > b[1:3, 1:3] = 2
-> > b
-> > 
-> > # C
-> > c = np.zeros((4,4))
-> > c[0:4:3, 0:] = 2
-> > c
-> > 
-> > # D
-> > d = np.zeros((4,4))
-> > d[0:4:3, 0:4:3] = 2
-> > d
-> > ~~~
-> > {: .langugae-python}
-> {: .solution}
-{: .challenge}
-
-> ## Powers Array
-> 
-> Generate a sequence of the first 10000 powers of 2 in a numpy array (starting at $2^0$).
-> Your output should be an array $[2^0, 2^1, 2^2, 2^3, ...]$.
-> 
-> > ## Solution
-> > 
-> > ~~~
-> > import time
-> > #List version
-> > ti=time.time()
-> > outloop=[2**i for i in range(10000)]
-> > tf=time.time()
-> > print('List time: {} seconds'.format(tf-ti))
-> > 
-> > #Numpy version-Complete the code:
-> > ti=time.time()
-> > out = np.array(2**i for i in range(10000))
-> > tf=time.time()
-> > print('NumPy time: {} seconds'.format(tf-ti))
-> > ~~~
-> > {: .language-python}
+> > Head to the solutions [notebook](../files/01-Fundamentals/soln/01-Soln-Fundamentals.ipynb).
+> >
 > {: .solution}
 {: .challenge}
 
