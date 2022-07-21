@@ -7,7 +7,7 @@ questions:
 - "What is Python's reference counter and garbage collector?"
 - "What are the different parallelisation strategies for Python?"
 objectives:
-- "Log into ICHEC's cluster and jupyterhub"
+- "Log into ICHEC's cluster and Jupyterhub"
 - "How to import images, code snippets and abstractions"
 - "How to structure callouts, highlighting"
 keypoints:
@@ -61,7 +61,7 @@ First though, we will make sure you can log into ICHEC systems.
 > need to log in. If you are already an ICHEC user and are partaking in this course live, please use your course 
 > account only.
 > 
-> You can log in using the following command
+> You can log in using the following command;
 >
 > ~~~
 > $ ssh courseXX@kay.ichec.ie
@@ -176,6 +176,8 @@ or return peculiar results.
 > $ git clone https://github.com/ICHEC-learn/python-hpc.git
 > ~~~
 > {: .language-bash}
+>
+> From here you can access all the materials that we will be going through.
 {: .challenge}
 
 > ## Using Jupyter Notebook cell magics
@@ -194,7 +196,8 @@ or return peculiar results.
 > This will save the code block as a file called `hello.py`. In a Jupyter notebook cell, you can type in `%` followed
 > by `Tab` and all the normal cell magics will be displayed.
 > 
-> We will be implementing cell magics in the [next episode](02-timing-simple-speedup.md).
+> We will be implementing cell magics in the 
+> [next episode](https://ichec-learn.github.io/python-hpc/02-timing-simple-speedup/index.html).
 {: .callout}
 
 {% include links.md %}
