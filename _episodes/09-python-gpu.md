@@ -144,7 +144,7 @@ threads a block can have. These constructions can be 1D,2D, or 3D. The example b
 A typical example of using a GPU to perform work is vector addition. This is a trivially parallelizable example 
 because the operation for each element of the array is independent. We will look at how this is done in C.
 
-<p align="center"><img src="../fig/notebooks/suma.png" width="40%"/></p>
+<p align="center"><img src="../fig/notebooks/suma.png" width="60%"/></p>
 
 ~~~
 #include <stdio.h>

@@ -27,7 +27,7 @@ parallelisation of for example `scipy` functions with minimum changes to the pyt
 their own multithreaded functions, so Dask is not essential.
 
 Dask can work very well in notebook environments, as it gives you a good visual representation as to what is going on.
-You can open up the [notebook](../files/) for this episode.
+You can open up the [notebook](../files/06-Dask/06-Dask_Array.ipynb) for this episode.
 
 We will first look at "Dask Distributed". The first step is to create a set of workers with a scheduler. Here we are
 creating 2 "worker" processes with 2 threads each. This means that we can assign a particular task to a specific 
@@ -92,7 +92,7 @@ differently.
 Upon entering the required passwords, your tunnel is set up and you can view your Dashboard. Entering `localhost:8787`
 into your web browser will produce something similar to below.
 
-<p align="center"><img src="../fig/dask-dashboard.png" width="40%"/></p>
+<p align="center"><img src="../fig/dask-dashboard.png" width="60%"/></p>
 
 If you are doing debugging of your system and seeing what is going on with load balancing, then this can be very 
 useful, giving you the amount of memory per worker and so on. If your program exceeds the memory usage specified in the
@@ -213,7 +213,7 @@ dask.visualize(dask_calpi)
 You will get an output similar to below, which shows we are only using 1 task. We need to split our workload into 
 multiple tasks.
 
-<p align="center"><img src="../fig/dask-calcpi-graph-1.png" width="10%"/></p>
+<p align="center"><img src="../fig/dask-calcpi-graph-1.png" width="30%"/></p>
 
 We can only get task parallelism if we call the function more than once. Below is an example of this.
 
@@ -232,7 +232,7 @@ dask.visualize(results)
 
 Running this will produce the following output, now with 5 tasks.
 
-<p align="center"><img src="../fig/dask-calcpi-graph-2.png" width="50%"/></p>
+<p align="center"><img src="../fig/dask-calcpi-graph-2.png" width="70%"/></p>
 
 > ## Continuing with Pi calculation
 >
@@ -344,7 +344,7 @@ a_da
 
 As an output we get a diagram.
 
-<p align="center"><img src="../fig/dask-array-1.png" width="50%"/></p>
+<p align="center"><img src="../fig/dask-array-1.png" width="40%"/></p>
 
 Notice that we split the 1D array into 4 chunks with a maximum size of 5 elements. Also that Dask is smart enough to 
 have setup a set of tasks.
@@ -470,8 +470,11 @@ much at all, but have still created a fairly complex set up.
 
 We can perform computations on larger-than-memory arrays!
 
+~~~
 client.restart()
 client.close()
+~~~
+{: .language-python}
 
 ## Calculate pi
 

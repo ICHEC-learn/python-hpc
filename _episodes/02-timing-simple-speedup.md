@@ -228,7 +228,8 @@ cProfile.run('func()', 'func.prof')
 ~~~
 {: .language-python}
 
-But there is not much point of this for a small function like this which has a limited runtime. We will look at another file, and this time run it through the terminal, and generate the `.prof` file.
+But there is not much point of this for a small function like this which has a limited runtime. We will look at another
+file, and this time run it through the terminal, and generate the `.prof` file.
 
 ~~~
 python -m cProfile -o heat_equation_simple.prof heat_equation_simple.py
@@ -242,7 +243,7 @@ Running Time: 20.20987105369568
 
 We need a separate module to look at the profile we have just created.
 
-### Investigatinf profiles with `pstats`
+### Investigating profiles with `pstats`
 
 * Prints execution time of selected functions. 
 * Sorts by function name, time, cumulative time, ... 
@@ -281,9 +282,10 @@ Day Month Date HH:MM:SS Year    heat_equation_simple.prof
 ~~~
 {: .output}
 
-Using this for longer programs and more functions can help you pin down the functions in your code which need optimisation.
+Using this for longer programs and more functions can help you pin down the functions in your code which need 
+optimisation.
 
-Using pstats in the terminal
+**Using pstats in the terminal**
 
 ~~~
 $ python -m pstats myprof.prof
@@ -299,7 +301,9 @@ Day Month Date HH:MM:SS Year my.prof
 
 > ## Montecarlo Pi
 >
-> There are three functions in the code block below. Each is a slightly different implementation of a Montecarlo algorithm for calculating the value of pi. Use time.time(), %timeit, cProfile and pstats to learn how the functions work. Are the timings what you would expect? What implementation is fastest for 1 million points?
+> There are three functions in the code block below. Each is a slightly different implementation of a Montecarlo 
+> algorithm for calculating the value of pi. Use `time.time()`, `%timeit`, `cProfile` and `pstats` to learn how the
+> functions work. Are the timings what you would expect? What implementation is fastest for 1 million points?
 >
 >
 > `pi_estimation_pure()` is a pure Python implementation using lists
@@ -309,8 +313,8 @@ Day Month Date HH:MM:SS Year my.prof
 > `pi_estimation_np() uses numpy to improve the performance of the algorithm.
 > 
 > 
-> Hint: You may want to try writing the three functions to a file and running cProfile on that file. You can use the ipython magic 
-> %%writefile
+> Hint: You may want to try writing the three functions to a file and running `cProfile` on that file. You can use
+> the ipython magic `%%writefile` if you are using a notebook.
 > 
 > ~~~
 > import math
@@ -362,21 +366,23 @@ Day Month Date HH:MM:SS Year my.prof
 >
 > > ## Solution
 > >
+> > You can find the solution in the [notebook](../files/01-Fundamentals/soln/01-Soln-Fundamentals.ipynb).
+> > 
 > {: .solution}
 {: .challenge}
 
 > ## Profiling the heat equation
 >
-> The file heat_equation_simple.py contains an inefficient implementation of the two dimensional heat equation. Use
-> cProfile and pstats to find where the time is most spent in the program (did in class)
+> The file `heat_equation_simple.py` contains an inefficient implementation of the two dimensional heat equation. Use
+> `cProfile` and `pstats` to find where the time is most spent in the program.
 >
-> Compare with the file heat_equation_index.py a more efficient version that uses indexing rather than for loops.
+> Compare with the file `heat_equation_index.py` a more efficient version that uses indexing rather than for loops.
 > 
 {: .challenge}
 
 ## NumPy - Fast Array Interface
 
-Python lists
+### Python lists
 
 One of the 4 main data types in Python:
 - lists `[1,2,3]`
@@ -409,24 +415,35 @@ In short they are very flexible but not good in practice, why?
 
 - Python has the luxury of being programmable without the user caring about the data types they are using. 
 - Lists may be flexible but also slow to process in numerical computations.
-- These are arrays of pointers to objects in sparse locations in memory, which cannot be easily cached and thus reading its values becomes a slower task.
+- These are arrays of pointers to objects in sparse locations in memory, which cannot be easily cached and thus reading
+  its values becomes a slower task.
 
-To become efficient in Data-driven programming and computation requires a good understanding of how data is stored and manipulated. This will help you in the long run. In statically typed languages like C++ or Java, all the variables have to be declared explicitly, a dynamically typed language like Python skips this step and is why it is more popular. This does have drawbacks when it comes to performance.
+To become efficient in Data-driven programming and computation requires a good understanding of how data is stored and
+manipulated. This will help you in the long run. In statically typed languages like C++ or Java, all the variables have
+to be declared explicitly, a dynamically typed language like Python skips this step and is why it is more popular. This
+does have drawbacks when it comes to performance.
 
 Thankfully, simple libraries like NumPy can assist with this
  
+### NumPy arrays
+
 **Features of the NumPy array**
 
 - Provides a convenient interface for working with multi-dimensional array data structures efficiently.
 - Arrays use contiguous blocks of memory that can be effectively cached by the CPU.
-- NumPy sacrifices Python's flexibility to achieve low-memory usage and speed-up, as NumPy arrays have a fixed size and the datatype of its element must be homogeneous.
+- NumPy sacrifices Python's flexibility to achieve low-memory usage and speed-up, as NumPy arrays have a fixed size and
+  the datatype of its element must be homogeneous.
 - Written in C, which is known for being a efficient programming language in terms of speed and memory usage.
 
-NumPy arrays can be created from a Python list or tuple by using NumPy’s array function. The dimensionality and shape of the resulting array will be determined by the given input. NumPy offers several functions for creating arrays, depending on the desired content and shape of the array.
+NumPy arrays can be created from a Python list or tuple by using NumPy’s array function. The dimensionality and shape
+of the resulting array will be determined by the given input. NumPy offers several functions for creating arrays, 
+depending on the desired content and shape of the array.
 
-When creating an array, NumPy will try to convert entries to convenient data type. If it is not possible, it will raise an error.
+When creating an array, NumPy will try to convert entries to convenient data type. If it is not possible, it will raise
+an error.
 
-Link to Numpy documentation: array
+Link to Numpy documentation: 
+[`array`](https://numpy.org/doc/stable/reference/generated/numpy.array.html?highlight=array#numpy.array)
 
 ~~~
 import numpy as np
@@ -454,14 +471,14 @@ b: 3D NumPy array
 ~~~
 {: .output}
 
+The main features of the above NumPy array are:
 
-The features of the above NumPy array:
-
-- Can have multiple dimensions
+- It has multiple dimensions
 - All elements have the same type
 - Number of elements in the array is fixed
 
-Understanding the shape and size of arrays is crucial in applications such as machine learning and deep learning. You will often need to reshape arrays.
+Understanding the shape and size of arrays is crucial in applications such as machine learning and deep learning. You
+will often need to reshape arrays.
 
 ~~~
 # Determine shape of array b
@@ -494,7 +511,8 @@ Array b_new:
 ~~~
 {: .language-bash}
 
-This is fine, but creates an issue with storage, particularly for large arrays. As we no longer need array b, we can get rid of it with del.
+This is fine, but creates an issue with storage, particularly for large arrays. As we no longer need array `b`, we can
+get rid of it with del.
 
 ~~~
 del b
@@ -512,12 +530,15 @@ NameError: name 'b' is not defined
 ~~~
 {: .output}
 
-In statically typed languages, one should always free up the memory taken up by variables, usually with keywords such as free
+In statically typed languages, one should always free up the memory taken up by variables, usually with keywords such as
+`free`.
 
-NumPy Array Indexing
-Indexing and Slicing are the most important concepts in working with arrays.
+### NumPy Array Indexing
 
-Indexing
+Indexing and Slicing are the most important concepts in working with arrays. We will start with indexing, which is the
+ability to point and get at a data element within an array. Indexing in Python, and most programming languages starts
+at the value of 0. The first element of the array is `index = 0`, the second has `index = 1` and so on. Let's see how
+we can use indexing to index the elements of a 1D, 2D and 3D array.
 
 ~~~
 mat1d = np.array([1,2,3,4,5,6])
@@ -553,7 +574,12 @@ print(mat3d[3,1,2])
 ~~~
 {: .output}
 
-Slicing 
+Slicing is also an important feature. Say that you have a very large array, but you only want to access the first `n`
+elements of the array, you would use slicing to do so. You call your array, then in square brackets tell it the start
+and end index that you want to slice.
+
+In the example of the first `n` elements of an array called `my_array`, the notation would be `my_array[0:n-1]`. There
+are more examples below.
 
 ~~~
 mat1d = np.arange(10)
@@ -567,6 +593,9 @@ mat1d[3:]
 array([3, 4, 5, 6, 7, 8, 9])
 ~~~
 {: .output}
+
+You can also slice using negative indexes, and call using steps. Say in an array of 0 to 100 you only wanted to grab
+the even or odd numbers.
 
 ~~~
 print(mat1d[:-2])
@@ -626,10 +655,10 @@ array([[[99,  1, 99,  6],
 ~~~
 {: .output}
 
-* There are many possible ways of arranging items of $N-$dimensional array in a 1-dimensional block.
-* NumPy uses striding where $N-$dimensional index; $ n_0, n_1, ... n_{(N-1)} $ corresponds to offset from the beginning of 1-dimensional block.
+There are many possible ways of arranging items of an N-dimensional array in a 1-dimensional block. NumPy uses striding
+where N-dimensional index; `n_0, n_1, ... n_(N-1)` corresponds to offset from the beginning of 1-dimensional block.
 
-<img src="../img/1.3.2.png" alt="Drawing" style="width: 500px;"/>
+<img src="../fig/notebooks/1.3.2.png" alt="Drawing" style="width: 500px;"/>
 
 `a = np.array(..)`
 
@@ -639,9 +668,12 @@ array([[[99,  1, 99,  6],
 * `a.data` - Python buffer object pointing to start of arrays data. 
 * `a.__array_interface__` - Python internal interface.
 
-This should be familiar, so feel free to check out the NumPy documentation for more utilisation of functions
+This should be familiar, so feel free to check out the NumPy documentation for more utilisation of functions.
 
-Why use vectorisation?
+### Vetorisation
+
+We should all be familiar with for loops in Python, and its reputation. Ideally we should be using vectorisation, which
+begs the question... why?
 
 - for loops in Python are very slow
 - vectorisation is an example of a SIMD operation
@@ -690,36 +722,37 @@ array([1, 1, 1, ..., 1, 1, 1])
 
 ## Caching
 
-What is the cache?
-The cache is a part of the computer's memory. Caching can provide an application performance boost as it is faster to access data from the temporary location than it is to fetch the data from the source each time.
-
-
-A computer's memory can consists of three elements
+You may ask... what is the cache? The cache is a part of the computer's memory. Caching can provide an application
+performance boost as it is faster to access data from the temporary location than it is to fetch the data from the
+source each time. A computer's memory can consists of three elements
 
 - Main memory (RAM or ROM):
 - Secondary memory
-- Cache: Acts as a buffer betwwen the CPU and main memory, used to hold parts of data and program most frequently used by the CPU.
+- Cache: Acts as a buffer betwwen the CPU and main memory, used to hold parts of data and program most frequently used
+  by the CPU.
 
+There are a few main rules of caching:
 
-The main rules of caching:
-
-- If a function is frequently called, its output is not changing often and it takes a long time to execute, it is a suitable candidate to implement caching.
+- If a function is frequently called, its output is not changing often and it takes a long time to execute, it is a 
+  suitable candidate to implement caching.
 - Caching should be faster than getting the data from the current data source
-- Caching impacts memory footprint, so it is crucial to choose and cache the data structures and attributes that need to be cached.
+- Caching impacts memory footprint, so it is crucial to choose and cache the data structures and attributes that need
+  to be cached.
 
-Caching itself is an optimization strategy that you can use in your applications to keep recent or often used data in memory locations that are faster to access.
+Caching itself is an optimization strategy that you can use in your applications to keep recent or often used data in
+memory locations that are faster to access.
 
-The LRU (Least Recently Used) Cache discatds the least recently used items first. The algorithm keeps track of;
+The LRU (Least Recently Used) Cache discards the least recently used items first. The algorithm keeps track of what was
+used. The functools module deals with high-order functions, specifically:
 
-what was used
-The functools module deals with high-order functions:
+- functions which operate on other functions
+- returning functions
+- other callable objects
 
-functions which operate on
-returning functions
-other callable objects
-The lru_cache() helps reduce the execution time of the function by using the memoization technique
+The `lru_cache()` helps reduce the execution time of the function by using the memoization technique.
 
-Caching in action for the Fibonacci sequence. The least recently used algorithm can cache the return values that are dependent on the arguments that have been passed to the function.
+Let's have a look at caching in action for the Fibonacci sequence. The least recently used algorithm can cache the
+return values that are dependent on the arguments that have been passed to the function.
 
 ~~~
 def fib(n):
@@ -762,29 +795,30 @@ print(t1.timeit(1))
 
 > ## Climbing stairs
 >
-> Imagine you want to determine all the different ways you can reach a specific stair in a staircase by hopping one, two, or three 
-> stairs at a time. 
+> Imagine you want to determine all the different ways you can reach a specific stair in a staircase by hopping one,
+> two, or three stairs at a time. 
 > 
 > How many paths are there to the fourth stair? Here are all the different combinations.
 > 
-> <img src="../img/stairs.png" alt="Drawing" style="width: 500px;"/>
+> <img src="../fig/notebooks/stairs.png" alt="Drawing" style="width: 500px;"/>
 > 
 > A solution to this problem is to state that;
 >
 > To reach your current stair, you can jump from one stair, two stairs, or three stairs below.</b>
 >
-> Adding up the number of jump combinations you can use to get to each of those points should give you the total number of possible ways to reach your current position.
+> Adding up the number of jump combinations you can use to get to each of those points should give you the total number
+> of possible ways to reach your current position.
 > 
 > For 4 stairs, there are 7 combinations. For 3 there is 4, and for 2 there is 2.
 >     
 > The file `stairs.py` implements recursion to solve the problem.
 > 
-> Create a timing setup and record the time taken for 40 iterations. Then implement the lru_cache and compare the improvement.
+> Create a timing setup and record the time taken for 40 iterations. Then implement the lru_cache and compare the 
+> improvement.
 >
 > > ## Solution
 > >
 > {: .solution}
 {: .challenge}
-
 
 {% include links.md %}
