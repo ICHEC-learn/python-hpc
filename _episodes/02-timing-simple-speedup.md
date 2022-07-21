@@ -1,7 +1,7 @@
 ---
 title: "Timing Code and Simple Speed-up Techniques"
-teaching: 10
-exercises: 0
+teaching: 30
+exercises: 45
 questions:
 - "How can I time my code"
 - "What is the difference between vectorisation and for loops?"
@@ -154,7 +154,7 @@ montecarlo_py(1000000)
 {: .language-python}
 
 If we want to time this using `timeit` we can modify the above statement using cell magics, and it will not produce the
-result, but rather the average duration
+result, but rather the average duration.
 
 ~~~
 %timeit montecarlo_py(1000000)
@@ -186,15 +186,15 @@ Minimum execution time: 7.153229266
 
 ### `cProfile`
 
-cProfile provides an API for profiling your Python program
-A profile is a set of stats
-Time spent in different parts of the program
+`cProfile` provides an API for profiling your Python program. A profile is a set of stats showing the time spent in
+different parts of the program. In bash you can use a profile statement to save results to a file `func.prof`.
 
 ~~~
-# profile statement and save results to a file func.prof
 cProfile.run('func()', 'func.prof')
 ~~~
 {: .language-bash}
+
+Alternatively, you can call it in Python.
 
 ~~~
 import cProfile
@@ -221,7 +221,7 @@ cProfile.run('montecarlo_py(1000000)')
 ~~~
 {: .output}
 
-This can be modified to save the output to a .prof file.
+This can be modified to save the output to a `.prof` file.
 
 ~~~
 cProfile.run('func()', 'func.prof')
@@ -241,13 +241,14 @@ Running Time: 20.20987105369568
 ~~~
 {: .output}
 
-We need a separate module to look at the profile we have just created.
+It's all well and good creating a `.prof` file, but we need a separate module to look at the profile we have just 
+created.
 
 ### Investigating profiles with `pstats`
 
-* Prints execution time of selected functions. 
-* Sorts by function name, time, cumulative time, ... 
-* Python module interface and interactive browser
+This is step 2 in profiling, analysing the profile and seeing where our functions are experiencing bottlenecks.
+`pstats` prints execution time of selected functions, while sorting by function name, time, cumulative time, etc. It is
+a python module interface and has an interactive browser.
 
 ~~~
 from pstats import Stats
@@ -283,9 +284,8 @@ Day Month Date HH:MM:SS Year    heat_equation_simple.prof
 {: .output}
 
 Using this for longer programs and more functions can help you pin down the functions in your code which need 
-optimisation.
-
-**Using pstats in the terminal**
+optimisation. Using pstats in the terminal is fairly simple, as it is incorporated into the python command. We will get
+a chance to try this out shortly.
 
 ~~~
 $ python -m pstats myprof.prof
@@ -306,7 +306,7 @@ Day Month Date HH:MM:SS Year my.prof
 > functions work. Are the timings what you would expect? What implementation is fastest for 1 million points?
 >
 >
-> `pi_estimation_pure()` is a pure Python implementation using lists
+> `pi_estimation_pure()` is a pure Python implementation using lists.
 > 
 > `pi_estimation_loop()` uses numpy arrays to replace the python lists.
 > 
@@ -384,7 +384,7 @@ Day Month Date HH:MM:SS Year my.prof
 
 ### Python lists
 
-One of the 4 main data types in Python:
+Python lists are one of the 4 main data types in Python:
 - lists `[1,2,3]`
 - tuples `(1,2,3)`
 - dictionaries `{"Food" : "fruit", "Type" : "banana"}`
@@ -418,16 +418,17 @@ In short they are very flexible but not good in practice, why?
 - These are arrays of pointers to objects in sparse locations in memory, which cannot be easily cached and thus reading
   its values becomes a slower task.
 
-To become efficient in Data-driven programming and computation requires a good understanding of how data is stored and
+To become efficient in data-driven programming and computation requires a good understanding of how data is stored and
 manipulated. This will help you in the long run. In statically typed languages like C++ or Java, all the variables have
 to be declared explicitly, a dynamically typed language like Python skips this step and is why it is more popular. This
 does have drawbacks when it comes to performance.
 
-Thankfully, simple libraries like NumPy can assist with this
+Thankfully, simple libraries like NumPy can assist with this.
  
 ### NumPy arrays
 
-**Features of the NumPy array**
+NumPy arrays are a massive upgrade to the Python lists. There are some slight disadvantages, but in all, the advantages
+for outweigh the disadvantages.
 
 - Provides a convenient interface for working with multi-dimensional array data structures efficiently.
 - Arrays use contiguous blocks of memory that can be effectively cached by the CPU.
@@ -440,9 +441,7 @@ of the resulting array will be determined by the given input. NumPy offers sever
 depending on the desired content and shape of the array.
 
 When creating an array, NumPy will try to convert entries to convenient data type. If it is not possible, it will raise
-an error.
-
-Link to Numpy documentation: 
+an error. Feel free to check out the link to Numpy documentation for more information.
 [`array`](https://numpy.org/doc/stable/reference/generated/numpy.array.html?highlight=array#numpy.array)
 
 ~~~
@@ -512,7 +511,7 @@ Array b_new:
 {: .language-bash}
 
 This is fine, but creates an issue with storage, particularly for large arrays. As we no longer need array `b`, we can
-get rid of it with del.
+get rid of it using `del`.
 
 ~~~
 del b
@@ -531,7 +530,7 @@ NameError: name 'b' is not defined
 {: .output}
 
 In statically typed languages, one should always free up the memory taken up by variables, usually with keywords such as
-`free`.
+`free` in C.
 
 ### NumPy Array Indexing
 
@@ -680,7 +679,7 @@ begs the question... why?
 - one instruction carries out many operands in parallel
 - less overhead compared to for loops
 
-Lets look at a difference example
+Lets look at a difference example:
 
 ~~~
 def loop_it(n):
@@ -714,9 +713,68 @@ array([1, 1, 1, ..., 1, 1, 1])
 ~~~
 {: .output}
 
-> ## Exericse
+> ## Arrays and slicing 
+>
+> Create arrays of zeros using `np.zeros`, then use slicing to obtain the following outputs:
+>
+> A
+> $$\begin{bmatrix} 0 & 0 & 0 & 0 \\ 2 & 2 & 2 & 2 \\ 2 & 2 & 2 & 2 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+> B
+> $$\begin{bmatrix} 0 & 0 & 0 & 0 \\ 0 & 2 & 2 & 0 \\ 0 & 2 & 2 & 0 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+> C
+> $$\begin{bmatrix} 2 & 2 & 2 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 2 & 2 & 2 & 2 \end{bmatrix}$$
+> D
+> $$\begin{bmatrix} 2 & 0 & 0 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 2 & 0 & 0 & 2 \end{bmatrix}$$
 >
 > > ## Solution
+> >
+> > ~~~
+> > # A
+> > a = np.zeros((4,4))
+> > a[1:3, :] = 2
+> > a
+> > 
+> > # B
+> > b = np.zeros((4,4))
+> > b[1:3, 1:3] = 2
+> > b
+> > 
+> > # C
+> > c = np.zeros((4,4))
+> > c[0:4:3, 0:] = 2
+> > c
+> > 
+> > # D
+> > d = np.zeros((4,4))
+> > d[0:4:3, 0:4:3] = 2
+> > d
+> > ~~~
+> > {: .langugae-python}
+> {: .solution}
+{: .challenge}
+
+> ## Powers Array
+> 
+> Generate a sequence of the first 10000 powers of 2 in a numpy array (starting at $2^0$).
+> Your output should be an array $[2^0, 2^1, 2^2, 2^3, ...]$.
+> 
+> > ## Solution
+> > 
+> > ~~~
+> > import time
+> > #List version
+> > ti=time.time()
+> > outloop=[2**i for i in range(10000)]
+> > tf=time.time()
+> > print('List time: {} seconds'.format(tf-ti))
+> > 
+> > #Numpy version-Complete the code:
+> > ti=time.time()
+> > out = np.array(2**i for i in range(10000))
+> > tf=time.time()
+> > print('NumPy time: {} seconds'.format(tf-ti))
+> > ~~~
+> > {: .language-python}
 > {: .solution}
 {: .challenge}
 
@@ -817,6 +875,8 @@ print(t1.timeit(1))
 > improvement.
 >
 > > ## Solution
+> >
+> > You can find the solution in the [Jupyter notebook](../files/01-Fundamentals/soln/01-Soln-Fundamentals.ipynb).
 > >
 > {: .solution}
 {: .challenge}
