@@ -1,7 +1,7 @@
 ---
 title: "Numba"
-teaching: 10
-exercises: 0
+teaching: 50
+exercises: 25
 questions:
 - "What is Just-In-Time compilation"
 - "How can I implement Numba"
@@ -36,13 +36,11 @@ It works with SIMD vectorisation to get most out of your CPU. What this means is
 applied to multiple data elements in parallel. Numba automatically translates some loops into vector instructions and
 will adapt to your CPU capabilities automatically.
 
-And to top it off, you can run Numba code on GPU. This will not be covered in this lesson however.
+And to top it off, as it works with threading, you can run Numba code on GPU. This will not be covered in this lesson 
+however, but we will cover GPUs in a later section.
 
 When it comes to importing the correct materials, a common workflow (and one which will be replicated throughout the
-episode) is as follows. It is very important to check the version of Numba that you have, as it is a rapidly evolving
-library with many changes happening on a regular basis. In your own time, it is best to have an environment set up with
-numba and update it regularly.
-
+episode) is as follows. 
 ~~~
 import numba
 from numba import jit, njit
@@ -51,7 +49,9 @@ print(numba.__version__)
 ~~~
 {: .language-python}
 
-We will be covering the `jit` and `njit` operators in the upcoming section.
+It is very important to check the version of Numba that you have, as it is a rapidly evolving
+library with many changes happening on a regular basis. In your own time, it is best to have an environment set up with
+numba and update it regularly. We will be covering the `jit` and `njit` operators in the upcoming section.
 
 ## The JIT Compiler Options/Toggles
 
@@ -66,30 +66,30 @@ go through.
 
 Looks like a lot, but let's go through the different options.
 
-- `signature`: The expected types and signatures of function arguments and return values. This is known as an "Eager 
+- **`signature`**: The expected types and signatures of function arguments and return values. This is known as an "Eager 
   Compilation".
 
-- Modes: Numba has two modes; `nopython`, `forcobj`. Numba will infer the argument types at call time, and generate
+- **Modes**: Numba has two modes; `nopython`, `forcobj`. Numba will infer the argument types at call time, and generate
   optimized code based on this information. If there is python object, the object mode will be used by default.
 
-- `nogil=True`: Releases the global interpreter lock inside the compiled function. This is one of the main reasons 
+- **`nogil=True`**: Releases the global interpreter lock inside the compiled function. This is one of the main reasons 
   python is considered as slow. However this only applies in `nopython` mode at present.
 
-- `cache=True`: Enables a file-based cache to shorten compilation times when the function was already compiled in a
+- **`cache=True`**: Enables a file-based cache to shorten compilation times when the function was already compiled in a
   previous invocation. It cannot be used in conjunction with `parallel=True`.
 
-- `parallel=True`: Enables the automatic parallelization of a number of common Numpy constructs.
+- **`parallel=True`**: Enables the automatic parallelization of a number of common Numpy constructs.
 
-- `error_model`: This controls the divide-by-zero behavior. Setting it to `python` causes divide-by-zero to raise an
+- **`error_model`**: This controls the divide-by-zero behavior. Setting it to `python` causes divide-by-zero to raise an
   exception. Setting it to `numpy` causes it to set the result to +/- infinity or `NaN`.
 
-- `fastmath=True`: This enables the use of otherwise unsafe floating point transforms as described in the LLVM 
+- **`fastmath=True`**: This enables the use of otherwise unsafe floating point transforms as described in the LLVM 
   documentation.
 
-- `locals` dictionary: This is used to force the types and signatures of particular local variables. It is however 
+- **`locals` dictionary**: This is used to force the types and signatures of particular local variables. It is however 
   recommended to let Numba’s compiler infer the types of local variables by itself.
 
-- `boundscheck=True`: This enables bounds checking for array indices. Out of bounds accesses will raise an `IndexError`. 
+- **`boundscheck=True`**: This enables bounds checking for array indices. Out of bounds accesses will raise an `IndexError`. 
   Enabling bounds checking will slow down typical functions, so it is recommended to only use this flag for debugging.
 
 ## Comparing pure Python and NumPy, with and without decorators
@@ -177,22 +177,22 @@ slow function and only using it once, then Numba will only slow it down. Therefo
 that you will be repeatedly using throughout your program.
 
 Once the compilation has taken place Numba caches the machine code version of the function for the particular types of 
-arguments presented, for example if we changed n = `1000.0`, we will get a longer execution time again, as the machine
-code has had to be rewritten. 
+arguments presented, for example if we changed n to `1000.0` as a floating point number, we will get a longer execution
+time again, as the machine code has had to be rewritten. 
 
 To benchmark Numba-compiled functions, it is important to time them without including the compilation step. 
 The compilation will only happen once for each set of input types, but the function will be called many times. By 
 adding `@jit` decorator we see major speed ups for Python and a bit for NumPy. Numba is very useful in speeding up 
 python loops that cannot be converted to NumPy or it's too complicated. NumPy can sometimes reduce readability. We can
-therefore get huge speed ups with minimum effort.
+therefore get significant speed ups with minimum effort.
 
 ## Demonstrating modes
 
 ### `nopython=True`
 
 Below we have a small function that determines whether a function is a prime number, then generate an array of random
-numbers. We are goinf to use a decorator for this example, which itself is a function that takes another function as
-its argument, and returns another function. This is as an alternative for using `@jit`.
+numbers. We are going to use a decorator for this example, which itself is a function that takes another function as
+its argument, and returns another function, defined by `is_prime_jit`. This is as an alternative to using `@jit`.
 
 ~~~
 def is_prime(n):
@@ -216,7 +216,8 @@ is_prime_jit = jit(is_prime)
 ~~~
 {: .language-python}
 
-Now we will time and run the function with pure python, jitted including compilation time and then purely with jit.
+Now we will time and run the function with pure python, jitted including compilation time and then purely with jit. 
+Take note of the timing setup, as you will use this regularly through the episode.
 
 ~~~
 print("Pure Python")
@@ -285,9 +286,9 @@ of python but cannot speed up by a large factor.
 
 ## Mandelbrot example
 
-Let's now create an example of the Mandelbrot set, this version more suited to a Julia set in reality. We won't go into
+Let's now create an example of the Mandelbrot set, or strictly speaking, a Julia set in reality. We won't go into
 full details on what is going on in the code, but there is a `while` loop in the `kernel` function that is causing this
-to be slow.
+to be slow as well as a couple of `for` loops in the `compute_mandel_py` function.
 
 ~~~
 import numpy as np
@@ -508,7 +509,7 @@ error about data types, so these will also need to be fixed.
 The point of using `cache=True` is to avoid repeating the compile time of large and complex functions at each run of a
 script. In the example below the function is simple and the time saving is limited but for a script with a number of
 more complex functions, using cache can significantly reduce the run-time. We have removed the python object that 
-caused the error. We will 
+caused the error. We will switch back to the `is_prime` function here.
 
 ~~~
 def is_prime(n):
@@ -630,8 +631,8 @@ is_prime_eager = njit(['boolean(int32)','boolean(int64)' ])(is_prime)
 The final one we will look at for `is_prime` is `fastmath=True`. This enables the use of otherwise unsafe floating
 point transforms. This means that it is possible to relax some numerical rigour with view of gaining additional 
 performance. As an example, it assumes that the arguments and result are not `NaN` or infinity values. Feel free to 
-investigate the [llvm docs](https://llvm.org/docs/LangRef.html#fast-math-flags). You have to be confident with the
-inputs of your code.
+investigate the [llvm docs](https://llvm.org/docs/LangRef.html#fast-math-flags). The key thing with this toggle is that
+you have to be confident with the inputs of your code and that there is no chance of returning `NaN` or infinity.
 
 ~~~
 is_prime_njit_fmath = njit(fastmath=True)(is_prime)
@@ -697,6 +698,8 @@ def pi_montecarlo_numpy(n):
         
     return 4.0 * in_circle / n
 
+n = 1000000
+
 pi_montecarlo_python_njit = njit()(pi_montecarlo_python)
 
 pi_montecarlo_numpy_njit = njit()(pi_montecarlo_numpy)
@@ -704,9 +707,6 @@ pi_montecarlo_numpy_njit = njit()(pi_montecarlo_numpy)
 pi_montecarlo_python_parallel = njit(parallel=True)(pi_montecarlo_python)
 
 pi_montecarlo_numpy_parallel = njit(parallel=True)(pi_montecarlo_numpy)
-
-
-n = 1000000
 ~~~
 {: .language-python}
 
@@ -791,7 +791,7 @@ So far we have been looking at just-in-time wrappers, these are “vectorized”
 `np.add()` is a ufunc.
 
 There are two main types of ufuncs:
-- Those which operate on scalars, ufuncs (see @vectorize below).
+- Those which operate on scalars, ufuncs (see `@vectorize` below).
 - Those which operate on higher dimensional arrays and scalars, these are “generalized universal functions” or gufuncs, 
   such as `@guvectorize`.
 
