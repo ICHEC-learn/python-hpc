@@ -314,7 +314,8 @@ Now, we want to say that if our rank equals 1, we have to receive it, for every 
 a receive, specifying the rank from which the message came from. If we are at `rank=0` and `rank=1` sent a message, we
 need to know to expect a message from `rank=1`. If, however, we are told to expect a message instead from `rank=2`, we
 will be waiting until the end of time for that message to arrive. A message that was never sent. These are known as 
-**deadlocks** and we will cover them in more detail in the [next episode](07-mpi-nonblocking-collectives.md). For now
+**deadlocks** and we will cover them in more detail in the 
+[next episode](https://ichec-learn.github.io/python-hpc/07-mpi-nonblocking-collectives/index.html). For now
 though let us look at our output.
 
 ~~~
@@ -444,6 +445,49 @@ P1 posts a **send** to **send** partial sum
 P0 sums the partial sums
 
 > ## Parallel sum implementation
+> 
+> Implement the parallel sum case study. That is;
+> 
+> - take the code block below
+> - implement the appropriate send/receive to distribute the data from rank 0
+> - perform the partial sum on each process
+> - implement the appropriate send/receive to gather the data at rank 0
+> - compute the final sum from the gathered data on rank 0
+> 
+> (Bonus) For added difficulty (and best practice), try to implement the same approach with an arbitrary number of processes.
+>
+> ~~~
+> from mpi4py import MPI
+> import numpy as np
+> 
+> comm = MPI.COMM_WORLD
+> rank = comm.Get_rank()
+> 
+> local_data = np.empty( , dtype=int)
+> 
+> # Distribute data
+> if rank==0:
+>     data = np.arange(100, dtype=int)
+>     local_data = data[] # TODO: choose appropriate range
+>     # TODO: Communicate
+> else:    
+>     # TODO: Communicate
+> 
+> # TODO: Compute local and partial sums
+> local_sum = np.sum(local_data)
+> 
+> # Collect data
+> if rank==0:
+>     partial_sums = np.empty( , dtype=int)
+>     # TODO: Communicate
+> 
+>     # TODO: Calculate total sum
+> 
+>     # TODO: Print result
+> else:
+>     # TODO: Communicate
+> ~~~
+> {: .language-python}
 > 
 > > ## Solution
 > > ~~~

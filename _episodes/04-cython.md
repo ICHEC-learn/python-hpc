@@ -1,7 +1,7 @@
 ---
 title: "Cython"
-teaching: 10
-exercises: 0
+teaching: 45
+exercises: 60
 questions:
 - "What is Cython?"
 - "What's happening under the hood?"
@@ -141,7 +141,8 @@ def fib_cyt(n):
 
 Before we change our `fibonacci_main.py` to implement the function using Cython, we need to ado a few more things.
 This `.pyx` file is compiled by Cython into a `.c` file, which itself is then compiled by a C compiler to a `.so` or
-`.dylib` file. We will learn a bit more about these different file types in the [next episode](05.cffi.md).
+`.dylib` file. We will learn a bit more about these different file types in the 
+[next episode](https://ichec-learn.github.io/python-hpc/05-cffi/index.html).
 
 There are a few different ways to build your extension module. We are going to look at a method which creates a file
 which we will call `setup_fib.py`, which "cythonises" the file. It can be viewed as the `Makefile` of python. In it, we
@@ -715,6 +716,29 @@ Using advanced techniques: 9.067986965179443
 Assuming the same speed up factor, our original code would take 39.29461018244425 minutes
 ~~~
 {: .output}
+
+> ## Optimising Cython from scratch
+>
+> Head to the [Jupyter notebook](../files/03-Cython/exercise/03-Cython-Exercise.ipynb) and scroll to Additional
+> Exercises. Look at the cProfile and see if you can improve the performance for the `heat_equation_simple.py` file.
+>
+> The file can be executed using;
+>
+> ~~~
+> $ python heat_equation_simple.py bottle.dat
+> ~~~
+> {: .language-bash}
+> 
+> There are two input files. Running the python file with `bottle.dat` will take ~20 seconds. The larger file,
+> `bottle_large.dat` will take ~10 minutes. Your target will be to bring the execution times of `bottle.dat` and
+> `bottle_large.dat` to < 0.1 second and < 5 seconds respectively.
+>
+> > ## Solution
+> > 
+> > The solution can be found in the Jupyter notebook [here](../files/03-Cython/exercise/03-Cython-Exercise-Solutions.ipynb)
+> > 
+> {: .solution}
+{: .challenge}
 
 <p align="center"><img src="../fig/notebooks/julia_set2.png" width="80%"/></p>
 

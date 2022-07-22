@@ -46,9 +46,11 @@ the next rank will start receive, so we have a serialisation routine.
 >
 > Which is a better situation to end up in? Having a;
 > 
-> Serialised routine?
+> - Serialised routine?
+> 
 > OR
-> A deadlock?
+>
+> - A deadlock?
 >
 > > ## Solution
 > >
@@ -338,7 +340,7 @@ rank 3 received NumPy array: [0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7]
 ~~~
 {: .output}
 
-## Scatter
+### Scatter
 
 <p align="center"><img src="../fig/notebooks/4.1.4.png" width="40%"/></p>
 
@@ -398,7 +400,7 @@ rank 1 received NumPy array: [4. 5. 6. 7.]
 ~~~
 {: .output}
 
-## Gathering
+### Gathering
 
 <p align="center"><img src="../fig/notebooks/4.1.5.png" width="40%"/></p>
 
@@ -516,7 +518,7 @@ gathered NumPy arrays: [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9.  0.  2.  4.  6. 
 > {: .solution}
 {: .challenge}
 
-## Reduction Operation
+### Reduction Operation
 
 <p align="center"><img src="../fig/notebooks/4.1.6.png" width="40%"/></p>
 

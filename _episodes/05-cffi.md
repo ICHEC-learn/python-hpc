@@ -25,15 +25,15 @@ performance related, and one must take into account that a lot of libraries whic
 these lower level languages, and if you only work in a higher level language, and the utility you need is in a lower 
 level language, then you have the tendency to get stuck, but there are a few things you can do, whether it be;
 
-- Porting some or all of the library to your language of choice**
+- Porting some or all of the library to your language of choice
 - Write an extension in C to that library to bridge the gap between the library and your language (in this case, Python)
 - Wrap the library in your preferred language’s foreign function interface.
 
 This is not just exclusive to Python, as there FFI libraries in languages like Ruby, Lisp, Perl etc, and FFI wrappers 
 are generally easier to write and maintain then a C-extension and are more portable and usable. The FFI term itself 
 refers to the ability for code written in one language, known as the host, in our case here being python to access and 
-invoke functions from another guest language, in this case being C, but you can also use fortran, NumPy has a f2py 
-library in there as well
+invoke functions from another guest language, in this case being C, but you can also use fortran, NumPy has a `f2py` 
+library as part of its functionality.
 
 It sounds like a great solution, but just because you can do something, doesn’t always mean its the best idea, 
 particularly if;
@@ -44,7 +44,7 @@ particularly if;
 2. **There are delicate callbacks from the guest language into the host.** Lower level languages can have very 
    specific callbacks which can cause problems in higher level languages if not called correctly.
 3. **If your lower level library makes use of compile time or preprocessor features.** Pure python does not have this 
-   functionality
+   functionality.
 
 
 ## C Foreign Function Interface for Python - `cffi`
@@ -53,18 +53,14 @@ Let us look more into the `cffi` library itself, which as the name suggests is t
 Python. It only applies to C, so C++ cannot be used here.
 
 To utilise CFFI well, a working knowledge of C is recommended. Although the Cython material from the
-[previous episode](04-cython.md) is a good introduction of the concepts, some practical experience with C will help
-for your learning experience.
+[previous episode](https://ichec-learn.github.io/python-hpc/04-cython/index.html) is a good introduction of the 
+concepts, some practical experience with C will help for your learning experience.
 
 The concept of CFFI is that you add C-like declarations to the Python code, so it has its similarities to Cython, but
 with some differences. In Cython we looked at static type declarations declaring variables as `int` or `double` etc, in
 CFFI, we will be dealing with items in the C source code such as pointers, which are a fundamental concept in C but not 
 referred to in python, so we need to declare these variables in Python to make sure they exist. We will give an 
 introduction to pointers and get you to use them in upcoming exercises.
-
-## Importing an existing library
-
-We are 
 
 > ## Difference between Windows and Mac systems
 >
@@ -409,7 +405,7 @@ well as `ffi`.
 >
 > Use either ABI in-line or API out-of-line methods as outlined above to import and implement this code.
 > 
-> Below is a skeleton code you can use to implement your library
+> Below is a skeleton code you can use to implement your library.
 > 
 > ~~~
 > import numpy as np 
@@ -474,6 +470,5 @@ well as `ffi`.
 > > A full solution can be found in the Jupyter notebook [here](../files/04-CFFI/soln/04-Soln-cffi.ipynb).
 > {: .solution}
 {: .challenge}
-
 
 {% include links.md %}
