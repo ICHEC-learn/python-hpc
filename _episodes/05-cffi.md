@@ -1,7 +1,7 @@
 ---
 title: "C Foreign Function Interface for Python"
-teaching: 10
-exercises: 0
+teaching: 30
+exercises: 30
 questions:
 - "What is a foreign function interface?"
 - "How can I implement CFFI?"

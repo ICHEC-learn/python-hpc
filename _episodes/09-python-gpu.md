@@ -1,7 +1,7 @@
 ---
 title: "GPUs with Python"
-teaching: 10
-exercises: 0
+teaching: 30
+exercises: 25
 questions:
 - "What is a GPU?"
 - "What is CUDA?"

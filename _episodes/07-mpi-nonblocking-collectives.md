@@ -1,7 +1,7 @@
 ---
 title: "Non-blocking and collective communications"
-teaching: 10
-exercises: 0
+teaching: 60
+exercises: 30
 questions:
 - "Why do we need non-blocking communication?"
 - "What are the different collective routines and how can I implement them?"
@@ -342,6 +342,7 @@ rank 3 received NumPy array: [0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7]
 
 Next we will look at scattering.
 
+### Broadcasting
 ### Scattering
 
 <p align="center"><img src="../fig/notebooks/4.1.4.png" width="40%"/></p>

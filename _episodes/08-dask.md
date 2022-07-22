@@ -1,7 +1,7 @@
 ---
 title: "Dask"
-teaching: 10
-exercises: 0
+teaching: 60
+exercises: 30
 questions:
 - "What is Dask?"
 - "How can I implement Dask array?"

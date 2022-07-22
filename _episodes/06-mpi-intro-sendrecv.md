@@ -1,7 +1,7 @@
 ---
 title: "MPI with Python"
-teaching: 10
-exercises: 0
+teaching: 45
+exercises: 60
 questions:
 - "What is the difference between a process and a thread?"
 - "What is the difference between shared and distributed memory?"
